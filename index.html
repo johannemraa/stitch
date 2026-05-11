@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FS-Hausmeisterservice — Professioneller Hausmeisterservice München & Region</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,300..700;1,6..12,300..400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#4a7c59",
+        "on-primary": "#ffffff",
+        "primary-fixed": "#c8e8d0",
+        "primary-fixed-dim": "#8ecf9e",
+        "on-primary-fixed": "#002110",
+        "on-primary-fixed-variant": "#2a6038",
+        "secondary": "#6b6358",
+        "on-secondary": "#ffffff",
+        "secondary-fixed": "#f0e8db",
+        "secondary-fixed-dim": "#d4ccbf",
+        "on-secondary-fixed": "#1e1a13",
+        "tertiary": "#705c30",
+        "on-tertiary": "#ffffff",
+        "tertiary-container": "#c4a66a",
+        "tertiary-fixed": "#f8e0a8",
+        "surface": "#faf6f0",
+        "surface-dim": "#dbd7cf",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#f5f1ea",
+        "surface-container": "#f0ece4",
+        "surface-container-high": "#eae6de",
+        "surface-container-highest": "#e4e0d8",
+        "surface-variant": "#e4e0d8",
+        "on-surface": "#2e3230",
+        "on-surface-variant": "#4a4e4a",
+        "outline": "#74796e",
+        "outline-variant": "#c4c8bc",
+        "background": "#faf6f0",
+        "on-background": "#2e3230",
+        "inverse-surface": "#2e3230",
+        "inverse-on-surface": "#f5f0e8",
+        "inverse-primary": "#8ecf9e",
+      },
+      fontFamily: {
+        "headline": ["Literata", "Georgia", "serif"],
+        "display": ["Cormorant Garamond", "Georgia", "serif"],
+        "body": ["Nunito Sans", "sans-serif"],
+        "label": ["Nunito Sans", "sans-serif"],
+      },
+    }
+  }
+}
+</script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #faf6f0;
+    color: #2e3230;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .font-headline, h1, h2, h3, h4, h5, h6 { font-family: 'Literata', Georgia, serif; }
+  .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f5f1ea; }
+  ::-webkit-scrollbar-thumb { background: #c4c8bc; border-radius: 3px; }
+
+  /* Nav */
+  #navbar {
+    background: rgba(250, 246, 240, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: box-shadow 0.4s ease, background 0.4s ease;
+  }
+  #navbar.scrolled {
+    background: rgba(250, 246, 240, 0.97);
+    box-shadow: 0 1px 24px rgba(46, 50, 48, 0.09);
+  }
+
+  /* Mobile menu */
+  #mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1); }
+  #mobile-menu.open { max-height: 360px; }
+
+  /* Hero display */
+  .hero-display {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 0.9;
+    color: #4a7c59;
+    letter-spacing: -0.02em;
+  }
+
+  /* Service cards */
+  .service-card {
+    transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.45s ease;
+    cursor: pointer;
+  }
+  .service-card:hover { transform: translateY(-10px); box-shadow: 0 24px 48px rgba(74,124,89,0.13); }
+
+  /* Button shine */
+  .btn-shine { position: relative; overflow: hidden; }
+  .btn-shine::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-shine:hover::after { left: 150%; }
+
+  /* Marquee */
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-track { display: flex; width: max-content; animation: marquee 28s linear infinite; }
+
+  /* Float */
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  .badge-float { animation: float 3.5s ease-in-out infinite; }
+
+  /* Testimonial transitions (handled by .t-card CSS) */
+
+  /* Accent line */
+  .accent-line { display: block; height: 3px; width: 0; background: #4a7c59; border-radius: 2px; margin-top: 10px; }
+
+  /* Section watermark */
+  .sec-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 8rem; font-weight: 300;
+    color: #4a7c59; opacity: 0.07;
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+
+  /* Process connector */
+  .process-connector {
+    position: absolute; top: 40px;
+    left: calc(12.5% + 40px); right: calc(12.5% + 40px);
+    height: 1px;
+    background: linear-gradient(90deg, #c4c8bc 0%, #4a7c59 50%, #c4c8bc 100%);
+    opacity: 0.4;
+  }
+
+  /* Stats */
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem; font-weight: 600;
+    line-height: 1; color: #4a7c59;
+  }
+
+  /* GSAP initial states */
+  .js-fade { opacity: 0; }
+  .js-up   { opacity: 0; transform: translateY(36px); }
+  .js-left { opacity: 0; transform: translateX(-30px); }
+  .js-right{ opacity: 0; transform: translateX(30px); }
+  .js-scale{ opacity: 0; transform: scale(0.92); }
+
+  /* Focus */
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74,124,89,0.3);
+  }
+
+  /* ── Animated Testimonials ── */
+  .t-card {
+    position: absolute;
+    inset: 0;
+    background: #faf6f0;
+    border: 1px solid rgba(196,200,188,0.5);
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(46,50,48,0.08);
+    transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+                transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    opacity: 0;
+    transform: translateX(60px) scale(0.96);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .t-card.t-active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+    z-index: 10;
+  }
+  .t-dot {
+    height: 10px;
+    border-radius: 9999px;
+    background: #c4c8bc;
+    transition: all 0.35s ease;
+    width: 10px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .t-dot.t-dot-active { width: 40px; background: #4a7c59; }
+  .t-stars { color: #f59e0b; letter-spacing: 2px; font-size: 1.05rem; }
+  .t-quote-glyph {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4.5rem;
+    line-height: 0.75;
+    color: rgba(74,124,89,0.15);
+    display: block;
+    transform: rotate(180deg);
+    margin-bottom: 0.25rem;
+    user-select: none;
+  }
+  .t-sep { border: none; border-top: 1px solid rgba(196,200,188,0.6); margin: 1.25rem 0; }
+  .t-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e4e0d8;
+    background: #f0ece4;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Literata', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: #4a7c59; flex-shrink: 0;
+  }
+  .t-stack-outer { position: relative; min-height: 380px; }
+  @media (max-width: 767px) { .t-stack-outer { min-height: 460px; } }
+
+  /* ── Expand-Map Cards ── */
+  .ec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px) { .ec-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .ec-grid { grid-template-columns: 1fr; } }
+
+  .ec-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #2e3230;
+    height: 148px;
+    transition: height 0.55s cubic-bezier(0.34,1.2,0.64,1),
+                box-shadow 0.3s ease;
+    will-change: transform;
+    user-select: none;
+  }
+  .ec-card.ec-expanded { height: 292px; }
+  .ec-card.ec-request { background: #2c2618; }
+  .ec-card:hover { box-shadow: 0 20px 48px rgba(46,50,48,0.28); }
+
+  .ec-pattern {
+    position: absolute; inset: 0;
+    opacity: 0.13; pointer-events: none;
+  }
+  .ec-collapsed {
+    position: absolute; inset: 0; padding: 20px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: opacity 0.25s ease;
+  }
+  .ec-card.ec-expanded .ec-collapsed { opacity: 0; pointer-events: none; }
+
+  .ec-detail {
+    position: absolute; inset: 0; padding: 20px;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease 0.18s;
+  }
+  .ec-card.ec-expanded .ec-detail { opacity: 1; pointer-events: auto; }
+
+  .ec-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 9999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; font-family: 'Nunito Sans', sans-serif;
+  }
+  .ec-badge-active { background: rgba(74,124,89,0.22); color: #8ecf9e; }
+  .ec-badge-request { background: rgba(112,92,48,0.25); color: #c4a66a; }
+
+  .ec-name {
+    font-family: 'Literata', serif;
+    font-size: 1.35rem; font-weight: 700;
+    color: #f5f0e8; line-height: 1.1;
+  }
+  .ec-coords {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 10px; color: rgba(245,240,232,0.35);
+    letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* Buildings SVG in expanded card */
+  .ec-buildings { flex: 1; display: flex; align-items: flex-end; padding: 4px 0 8px; opacity: 0.55; }
+
+  .ec-contact-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #4a7c59; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 9px 16px; font-size: 12px; font-weight: 700;
+    font-family: 'Nunito Sans', sans-serif;
+    cursor: pointer; text-decoration: none;
+    transition: opacity 0.2s ease;
+    margin-top: 10px; width: 100%;
+    justify-content: center;
+  }
+  .ec-card.ec-request .ec-contact-btn { background: #705c30; }
+  .ec-contact-btn:hover { opacity: 0.88; }
+
+  /* Request form */
+  .ec-request-section {
+    background: #faf6f0;
+    border: 1px solid rgba(196,200,188,0.5);
+    border-radius: 20px; padding: 32px;
+    margin-top: 20px;
+  }
+
+  /* Single expand-map card */
+  #ec-map-card { width: 100%; cursor: pointer; }
+  #ec-map-card.ec-expanded { height: 360px; transform: none !important; cursor: default; }
+  #ec-map-card .ec-detail { padding: 0; overflow: hidden; border-radius: 16px; }
+  #ec-leaflet-map { width: 100%; flex: 1; min-height: 0; }
+
+  /* Leaflet terra skin — CartoDB Positron */
+  .leaflet-container { background: #f5f3ef !important; font-family: 'Nunito Sans', sans-serif; }
+  .leaflet-tile { filter: saturate(0.82) brightness(1.01); }
+  .leaflet-control-zoom a { background: #faf6f0 !important; color: #4a7c59 !important; border-color: #c4c8bc !important; border-radius: 8px !important; }
+  .leaflet-control-zoom a:hover { background: #4a7c59 !important; color: #fff !important; }
+  .leaflet-control-zoom { border: none !important; border-radius: 10px !important; overflow: hidden; box-shadow: 0 2px 10px rgba(46,50,48,0.12) !important; }
+  .leaflet-control-attribution { background: rgba(250,246,240,0.9) !important; font-size: 9px !important; border-radius: 6px !important; }
+  /* Popup terra skin */
+  .ec-popup .leaflet-popup-content-wrapper {
+    background: #faf6f0; border: 1px solid #c4c8bc; border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(46,50,48,0.16); padding: 0;
+  }
+  .ec-popup .leaflet-popup-content { margin: 14px 18px; }
+  .ec-popup .leaflet-popup-tip-container { margin-top: -1px; }
+  .ec-popup .leaflet-popup-tip { background: #faf6f0; }
+  .ec-popup .leaflet-popup-close-button { color: #74796e !important; top: 8px !important; right: 10px !important; font-size: 16px !important; }
+
+  /* #anfrage highlight when redirected from map */
+  @keyframes anfrageGlow {
+    0%   { box-shadow: 0 8px 48px rgba(46,50,48,0.11), 0 0 0 0 rgba(74,124,89,0); }
+    25%  { box-shadow: 0 8px 48px rgba(46,50,48,0.14), 0 0 0 8px rgba(74,124,89,0.3); }
+    75%  { box-shadow: 0 8px 48px rgba(46,50,48,0.14), 0 0 0 8px rgba(74,124,89,0.2); }
+    100% { box-shadow: 0 8px 48px rgba(46,50,48,0.11), 0 0 0 0 rgba(74,124,89,0); }
+  }
+  #anfrage.map-hl { animation: anfrageGlow 1s ease-out 2; border-color: rgba(74,124,89,0.45) !important; }
+</style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased">
+
+<!-- ════════════════════════ NAV ════════════════════════ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 border-b border-outline-variant/30">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+
+    <a href="#" class="flex items-center gap-2.5 group">
+      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-sm shadow-primary/30">
+        <span class="material-symbols-outlined text-on-primary text-[18px]" style="font-variation-settings:'FILL' 1">home_repair_service</span>
+      </div>
+      <span class="font-headline text-[1.1rem] font-bold text-on-surface">FS-Hausmeisterservice</span>
+    </a>
+
+    <ul class="hidden md:flex items-center gap-8">
+      <li><a href="#leistungen" class="text-primary font-semibold text-sm border-b-2 border-primary/60 pb-0.5">Leistungen</a></li>
+      <li><a href="#ablauf" class="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Ablauf</a></li>
+      <li><a href="#einsatzgebiet" class="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Einsatzgebiet</a></li>
+      <li><a href="#bewertungen" class="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Bewertungen</a></li>
+    </ul>
+
+    <div class="hidden md:flex items-center gap-4">
+      <a href="tel:+4908151950013" class="text-on-surface-variant hover:text-primary text-sm transition-colors font-medium flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">phone</span>08151 / 9500131
+      </a>
+      <a href="#anfrage" class="btn-shine bg-primary text-on-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-primary/25 hover:opacity-95 transition-opacity">
+        Kostenlos anfragen
+      </a>
+    </div>
+
+    <button id="menu-btn" class="md:hidden p-1 text-on-surface" aria-label="Menü">
+      <span class="material-symbols-outlined text-[28px]" id="menu-icon">menu</span>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="md:hidden bg-surface border-t border-outline-variant/20">
+    <div class="px-6 py-5 space-y-3">
+      <a href="#leistungen" class="block text-on-surface font-medium py-2 border-b border-outline-variant/20 text-sm">Leistungen</a>
+      <a href="#ablauf" class="block text-on-surface font-medium py-2 border-b border-outline-variant/20 text-sm">Ablauf</a>
+      <a href="#einsatzgebiet" class="block text-on-surface font-medium py-2 border-b border-outline-variant/20 text-sm">Einsatzgebiet</a>
+      <a href="#bewertungen" class="block text-on-surface font-medium py-2 border-b border-outline-variant/20 text-sm">Bewertungen</a>
+      <a href="#anfrage" class="block bg-primary text-on-primary text-center px-5 py-3 rounded-xl font-bold text-sm mt-2">Kostenlos anfragen</a>
+    </div>
+  </div>
+</nav>
+
+<main class="flex-grow pt-[72px]">
+
+<!-- ════════════════════════ HERO ════════════════════════ -->
+<section class="relative min-h-[calc(100vh-72px)] flex items-center bg-surface-container-low overflow-hidden">
+
+  <div class="absolute inset-0 scale-110" id="hero-bg-wrap">
+    <img id="hero-img"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqwZyzGiShMcfvIUewdv3PABAyYdKvyjf7KgmrN7IcWbSCHg1gSEQq9ZG8ygqlUUGWdHmXEMIyrHL332VKxfNPeOSvguBsryqawYO6rlH4Z0x91gA5a2BTJfdPMS1Q9aDL_DqD6lFU-PWxZtQLd4cxXt86xky39_QHbW_luAQsPXE5qEw_qVikuWCVKsk9bx5mni9mffm8_WTuLwbhljAYxTEEHGRasIf6EQ_TXGu6_Pfx4CejPXZLUn6KwLX7ZRA0UaFAxNVmXjo"
+      alt="Hausmeister bei der Arbeit"
+      class="w-full h-full object-cover opacity-70 mix-blend-multiply"
+    />
+    <div class="absolute inset-0 bg-gradient-to-r from-background/95 via-background/65 to-background/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent"></div>
+  </div>
+
+  <div class="absolute right-[8%] top-1/2 -translate-y-1/2 w-72 h-72 rounded-full border border-primary/10 hidden lg:block pointer-events-none js-fade" id="hero-ring"></div>
+
+  <div class="relative z-10 max-w-[1200px] mx-auto px-6 md:px-12 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
+
+    <div>
+      <div class="flex items-center gap-3 mb-7 js-up" id="h-eyebrow">
+        <div class="w-8 h-px bg-primary"></div>
+        <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">München &amp; Region · Professioneller Hausmeisterservice</span>
+      </div>
+
+      <div class="js-up mb-7" id="h-headline">
+        <h1 class="font-headline text-[3.2rem] md:text-[4.2rem] lg:text-[5rem] font-bold text-on-surface leading-[1.05] tracking-tight">
+          Genießen Sie
+        </h1>
+        <div class="hero-display text-[4.5rem] md:text-[6rem] lg:text-[7.5rem]">
+          Ihre Freizeit.
+        </div>
+        <h1 class="font-headline text-[3.2rem] md:text-[4.2rem] lg:text-[5rem] font-bold text-on-surface leading-[1.05] tracking-tight">
+          Auf uns ist Verlass.
+        </h1>
+      </div>
+
+      <p class="font-body text-lg text-on-surface-variant max-w-md leading-relaxed mb-10 js-up" id="h-sub">
+        FS-Hausmeisterservice kümmert sich zuverlässig um alles rund um Ihre Immobilie — von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-4 mb-14 js-up" id="h-cta">
+        <a href="#anfrage" class="btn-shine bg-primary text-on-primary px-8 py-4 rounded-2xl font-bold text-base shadow-lg shadow-primary/30 hover:opacity-95 transition-all flex items-center gap-2 group">
+          Jetzt kostenlos anfragen
+          <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </a>
+        <a href="#leistungen" class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm group">
+          <span class="w-11 h-11 rounded-full border border-outline-variant flex items-center justify-center group-hover:border-primary group-hover:bg-surface-container transition-all">
+            <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+          </span>
+          Unsere Leistungen
+        </a>
+      </div>
+
+      <div class="flex flex-wrap gap-8 js-up" id="h-stats">
+        <div>
+          <div class="stat-number">10</div>
+          <div class="text-[11px] font-bold tracking-[0.15em] uppercase text-on-surface-variant font-label mt-1">Einsatzgebiete</div>
+        </div>
+        <div class="w-px bg-outline-variant/40 self-stretch"></div>
+        <div>
+          <div class="stat-number">100%</div>
+          <div class="text-[11px] font-bold tracking-[0.15em] uppercase text-on-surface-variant font-label mt-1">Zuverlässig</div>
+        </div>
+        <div class="w-px bg-outline-variant/40 self-stretch"></div>
+        <div>
+          <div class="stat-number">Gratis</div>
+          <div class="text-[11px] font-bold tracking-[0.15em] uppercase text-on-surface-variant font-label mt-1">Angebot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anfrage-Formular -->
+    <div id="anfrage" class="bg-surface/95 backdrop-blur-sm rounded-3xl shadow-[0_8px_48px_rgba(46,50,48,0.11)] p-8 md:p-10 border border-outline-variant/20 max-w-md w-full mx-auto lg:ml-auto js-right">
+      <div class="flex items-start justify-between mb-7">
+        <div>
+          <h2 class="font-headline text-2xl font-bold text-on-surface">Kostenloses Angebot</h2>
+          <p class="font-body text-sm text-on-surface-variant mt-1">Unverbindlich · Wir melden uns schnell zurück</p>
+        </div>
+        <div class="w-11 h-11 bg-primary-fixed rounded-2xl flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">handyman</span>
+        </div>
+      </div>
+
+      <form id="quote-form" class="space-y-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant mb-1.5 tracking-[0.12em] uppercase">Name *</label>
+          <input type="text" id="qf-name" name="name" placeholder="Ihr Name" required
+            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 transition-all"/>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-on-surface-variant mb-1.5 tracking-[0.12em] uppercase">E-Mail *</label>
+            <input type="email" id="qf-email" name="email" placeholder="ihre@email.de" required
+              class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 transition-all"/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-on-surface-variant mb-1.5 tracking-[0.12em] uppercase">Telefon *</label>
+            <input type="tel" id="qf-phone" name="phone" placeholder="0176 / …" required
+              class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 transition-all"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant mb-1.5 tracking-[0.12em] uppercase">Leistung</label>
+          <div class="relative">
+            <select id="qf-service" name="service" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface appearance-none transition-all">
+              <option value="">Leistung wählen …</option>
+              <option>Garten- &amp; Landschaftspflege</option>
+              <option>Gebäude- &amp; Treppenhausreinigung</option>
+              <option>Fensterreinigung</option>
+              <option>Winterdienst / Schneeräumung</option>
+              <option>Dachrinnenreinigung</option>
+              <option>Montagearbeiten &amp; Entrümpelung</option>
+              <option>Sonstiges / Mehrere Leistungen</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">expand_more</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant mb-1.5 tracking-[0.12em] uppercase">Ihr Anliegen</label>
+          <textarea id="qf-message" name="message" placeholder="Beschreiben Sie kurz Ihr Anliegen …" rows="3"
+            class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 resize-none transition-all"></textarea>
+        </div>
+        <button type="submit" id="form-btn"
+          class="btn-shine w-full bg-on-surface text-surface px-6 py-4 rounded-xl font-bold text-sm hover:bg-on-surface-variant transition-all flex items-center justify-center gap-2 group">
+          Anfrage absenden
+          <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform" id="form-icon">send</span>
+        </button>
+        <p class="text-center text-[11px] text-on-surface-variant/50">Kein Auftrag, kein Risiko · 100% kostenlos</p>
+        <div class="flex items-center justify-center gap-6 mt-3">
+          <a href="tel:+4908151950013" class="flex items-center gap-1.5 text-primary text-xs font-bold font-label hover:underline">
+            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">phone</span>08151 / 9500131
+          </a>
+          <a href="tel:+4917636243434" class="flex items-center gap-1.5 text-on-surface-variant text-xs font-label hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">smartphone</span>0176 / 36243434
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-35 pointer-events-none">
+    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-on-surface-variant font-label">Scrollen</span>
+    <div class="w-px h-10 bg-outline-variant" style="animation: pulse 2s ease-in-out infinite;"></div>
+  </div>
+</section>
+
+<!-- ════════════════════════ MARQUEE ════════════════════════ -->
+<div class="bg-primary py-4 overflow-hidden" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="flex items-center gap-14 pr-14 flex-shrink-0">
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span>Garten- &amp; Landschaftspflege
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">cleaning_services</span>Gebäudereinigung
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">ac_unit</span>Winterdienst
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">water_drop</span>Fensterreinigung
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">location_on</span>München &middot; Starnberg &middot; Weilheim
+      </span>
+    </div>
+    <div class="flex items-center gap-14 pr-14 flex-shrink-0">
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span>Garten- &amp; Landschaftspflege
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">cleaning_services</span>Gebäudereinigung
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">ac_unit</span>Winterdienst
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">water_drop</span>Fensterreinigung
+      </span>
+      <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">location_on</span>München &middot; Starnberg &middot; Weilheim
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ LEISTUNGEN ════════════════════════ -->
+<section id="leistungen" class="py-28 bg-surface-container-low">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-20 gap-6">
+      <div class="relative">
+        <span class="sec-num absolute -top-8 -left-4">01</span>
+        <div class="flex items-center gap-3 mb-4 relative z-10 js-up">
+          <div class="w-7 h-px bg-primary"></div>
+          <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">Unsere Leistungen</span>
+        </div>
+        <h2 class="font-headline text-[2.6rem] md:text-[3.2rem] font-bold text-on-surface relative z-10 js-up">Was wir für Sie tun</h2>
+        <span class="accent-line js-line"></span>
+      </div>
+      <p class="font-body text-lg text-on-surface-variant max-w-sm md:text-right leading-relaxed js-up">
+        Kompletter Hausmeisterservice aus einer Hand — von der Grünpflege über Reinigung bis zum Winterdienst.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- 01 — Garten -->
+      <div class="service-card bg-surface rounded-2xl p-7 border border-outline-variant/20 group js-up flex flex-col">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-5 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">yard</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 01</div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Garten- &amp; Landschaftspflege</h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Rasenmähen, Heckenschnitt, Unkrautentfernung und Gartenrevitalisierung — damit Ihr Außenbereich das ganze Jahr gepflegt aussieht.</p>
+        <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 02 — Reinigung (featured) -->
+      <div class="service-card bg-primary rounded-2xl p-7 group js-up relative overflow-hidden flex flex-col" style="transition-delay:0.08s">
+        <div class="absolute top-4 right-4 bg-on-primary/15 rounded-full px-3 py-1 text-on-primary/80 text-[10px] font-bold tracking-widest uppercase font-label">Beliebt</div>
+        <div class="w-12 h-12 bg-on-primary/15 rounded-2xl flex items-center justify-center mb-5 text-on-primary flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">cleaning_services</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-on-primary/50 mb-2 font-label">Leistung 02</div>
+        <h3 class="font-headline text-lg font-bold text-on-primary mb-2">Gebäude- &amp; Treppenhausreinigung</h3>
+        <p class="font-body text-on-primary/70 text-sm leading-relaxed flex-1">Büroreinigung, Treppenhausreinigung, Grundreinigung, Fenster- und Dachrinnenreinigung — makellose Ergebnisse, auf die Sie sich verlassen können.</p>
+        <div class="flex items-center gap-2 text-on-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 03 — Winterdienst -->
+      <div class="service-card bg-surface rounded-2xl p-7 border border-outline-variant/20 group js-up flex flex-col" style="transition-delay:0.16s">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-5 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">ac_unit</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 03</div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Winterdienst</h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Zuverlässige Schneeräumung und Streuung für Einfahrten, Gehwege und Eingänge — damit Ihre Immobilie auch im Winter sicher bleibt.</p>
+        <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 04 — Fenster & Dachrinnen -->
+      <div class="service-card bg-surface rounded-2xl p-7 border border-outline-variant/20 group js-up flex flex-col" style="transition-delay:0.06s">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-5 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">water_drop</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 04</div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Fenster- &amp; Dachrinnenreinigung</h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Kristallklare Scheiben und freie Abflüsse — professionell und termingerecht erledigt, ohne Rückstände.</p>
+        <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 05 — Montage & Entrümpelung -->
+      <div class="service-card bg-surface rounded-2xl p-7 border border-outline-variant/20 group js-up flex flex-col" style="transition-delay:0.14s">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-5 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">home_repair_service</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 05</div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Montagearbeiten &amp; Entrümpelung</h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Aufbau, Abbau und Räumung nach Bedarf — schnell, sauber und von erfahrenen Fachkräften durchgeführt.</p>
+        <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 06 — Hausmeisterdienste -->
+      <div class="service-card bg-surface rounded-2xl p-7 border border-outline-variant/20 group js-up flex flex-col" style="transition-delay:0.22s">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-5 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 flex-shrink-0">
+          <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">handyman</span>
+        </div>
+        <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 06</div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Hausmeisterdienste</h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Kleinere Reparaturen, Inspektionen und laufende Objektbetreuung — zuverlässige Betreuung Ihrer Immobilie rund ums Jahr.</p>
+        <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
+          Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ ABLAUF ════════════════════════ -->
+<section id="ablauf" class="py-28 bg-surface relative overflow-hidden">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+
+    <div class="text-center mb-20">
+      <div class="flex items-center justify-center gap-3 mb-4 js-up">
+        <div class="w-7 h-px bg-primary"></div>
+        <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">So funktioniert es</span>
+        <div class="w-7 h-px bg-primary"></div>
+      </div>
+      <h2 class="font-headline text-[2.6rem] md:text-[3.2rem] font-bold text-on-surface js-up">Einfach. Transparent. Zuverlässig.</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+      <div class="process-connector hidden md:block"></div>
+
+      <div class="flex flex-col items-center text-center js-up">
+        <div class="w-20 h-20 rounded-full bg-secondary-fixed border-4 border-surface flex items-center justify-center mb-6 relative z-10 shadow-md">
+          <span class="font-display text-3xl font-semibold text-primary">1</span>
+        </div>
+        <h4 class="font-headline font-bold text-on-surface mb-2">Erstkontakt</h4>
+        <p class="font-body text-sm text-on-surface-variant">Rufen Sie uns an oder schreiben Sie uns. Kostenlos und unverbindlich.</p>
+      </div>
+
+      <div class="flex flex-col items-center text-center js-up" style="transition-delay:0.1s">
+        <div class="w-20 h-20 rounded-full bg-secondary-fixed border-4 border-surface flex items-center justify-center mb-6 relative z-10 shadow-md">
+          <span class="font-display text-3xl font-semibold text-primary">2</span>
+        </div>
+        <h4 class="font-headline font-bold text-on-surface mb-2">Angebot</h4>
+        <p class="font-body text-sm text-on-surface-variant">Wir erstellen ein klares, transparentes Angebot ohne versteckte Kosten.</p>
+      </div>
+
+      <div class="flex flex-col items-center text-center js-up" style="transition-delay:0.2s">
+        <div class="w-20 h-20 rounded-full bg-secondary-fixed border-4 border-surface flex items-center justify-center mb-6 relative z-10 shadow-md">
+          <span class="font-display text-3xl font-semibold text-primary">3</span>
+        </div>
+        <h4 class="font-headline font-bold text-on-surface mb-2">Professionelle Ausführung</h4>
+        <p class="font-body text-sm text-on-surface-variant">Sorgfältige Ausführung durch erfahrene Fachkräfte — pünktlich und gründlich.</p>
+      </div>
+
+      <div class="flex flex-col items-center text-center js-up" style="transition-delay:0.3s">
+        <div class="w-20 h-20 rounded-full bg-primary border-4 border-surface flex items-center justify-center mb-6 relative z-10 shadow-md shadow-primary/25">
+          <span class="material-symbols-outlined text-on-primary text-[28px]" style="font-variation-settings:'FILL' 1">verified</span>
+        </div>
+        <h4 class="font-headline font-bold text-on-surface mb-2">Ihre Zufriedenheit</h4>
+        <p class="font-body text-sm text-on-surface-variant">Wir sind erst zufrieden, wenn Sie es sind. Das ist unser Versprechen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ EINSATZGEBIET ════════════════════════ -->
+<section id="einsatzgebiet" class="py-28 bg-surface-container relative overflow-hidden">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+    <div class="flex flex-col md:flex-row items-start gap-12 lg:gap-16">
+
+      <!-- ── Left: text content ── -->
+      <div class="md:w-[55%] flex flex-col gap-8">
+        <div class="relative">
+          <span class="sec-num absolute -top-8 -left-4">02</span>
+          <div class="flex items-center gap-3 mb-4 relative z-10 js-up">
+            <div class="w-7 h-px bg-primary"></div>
+            <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">Einsatzgebiet</span>
+          </div>
+          <h2 class="font-headline text-[2.6rem] md:text-[3.2rem] font-bold text-on-surface relative z-10 js-up">Unser Einsatzgebiet</h2>
+          <span class="accent-line js-line"></span>
+        </div>
+
+        <p class="font-body text-lg text-on-surface-variant leading-relaxed js-up">
+          Starnberg und die gesamte Region am See — von Gauting bis Weilheim, von Herrsching bis Tutzing. Klicken Sie auf einen Ort für mehr Infos.
+        </p>
+
+        <!-- Contact info cards -->
+        <div class="space-y-3 js-up">
+          <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 flex items-start gap-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">location_on</span>
+            </div>
+            <div>
+              <h4 class="font-headline font-bold text-on-surface text-base">10 Gemeinden im Einsatz</h4>
+              <p class="font-body text-on-surface-variant text-sm mt-1">Starnberger-See-Region, Ammersee &amp; Weilheim. Erweiterter Service auf Anfrage möglich.</p>
+            </div>
+          </div>
+          <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 flex items-start gap-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 bg-tertiary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings:'FILL' 1">phone</span>
+            </div>
+            <div>
+              <h4 class="font-headline font-bold text-on-surface text-base">Direkt zu Herrn Sijarina</h4>
+              <p class="font-body text-on-surface-variant text-sm mt-1">
+                <a href="tel:+4908151950013" class="hover:text-primary transition-colors font-semibold">08151 / 9500131</a>
+                &nbsp;·&nbsp;
+                <a href="tel:+4917636243434" class="hover:text-primary transition-colors font-semibold">0176 / 36243434</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request a new location -->
+        <div class="ec-request-section js-up" style="margin-top:0">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings:'FILL' 1">add_location_alt</span>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface text-base">Ihr Ort ist nicht dabei?</h3>
+              <p class="font-body text-on-surface-variant text-sm">Wir prüfen gerne, ob wir tätig werden können.</p>
+            </div>
+          </div>
+          <form id="location-form" class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="location-input" placeholder="Ort oder PLZ eingeben …"
+              class="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 transition-all"/>
+            <button type="submit"
+              class="btn-shine bg-primary text-on-primary px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap flex items-center gap-2 justify-center hover:opacity-95 transition-opacity">
+              <span class="material-symbols-outlined text-[18px]">send</span>Anfragen
+            </button>
+          </form>
+          <p class="text-[11px] text-on-surface-variant/50 mt-3" id="location-form-msg"></p>
+        </div>
+      </div>
+
+      <!-- ── Right: expand map card (square when open) ── -->
+      <div class="md:w-[45%] w-full js-right" style="align-self:flex-start">
+        <div id="ec-map-card" class="ec-card">
+          <!-- Grid pattern background -->
+          <svg class="ec-pattern" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="ec-gp" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#fff" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#ec-gp)"/>
+          </svg>
+
+          <!-- Collapsed state -->
+          <div class="ec-collapsed">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="ec-badge ec-badge-active" style="display:flex;align-items:center;gap:5px">
+                <span style="width:6px;height:6px;background:#8ecf9e;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite"></span>
+                Aktives Einsatzgebiet
+              </span>
+              <span style="font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.3);font-weight:600;letter-spacing:0.05em">Karte wird geladen …</span>
+            </div>
+            <div>
+              <div class="ec-name" style="font-size:1.55rem">Starnberg &amp; Region</div>
+              <div class="ec-coords" style="margin-top:5px">10 Einsatzgebiete · Starnberger See · Ammersee · Weilheim</div>
+            </div>
+          </div>
+
+          <!-- Expanded state: interactive map -->
+          <div class="ec-detail" style="display:flex;flex-direction:column">
+            <div style="padding:13px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07)">
+              <span class="ec-badge ec-badge-active" style="display:flex;align-items:center;gap:5px">
+                <span style="width:6px;height:6px;background:#8ecf9e;border-radius:50%;flex-shrink:0"></span>
+                Aktives Einsatzgebiet
+              </span>
+              <span style="font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.35);font-weight:600">10 Standorte · Klicken zum Schließen</span>
+            </div>
+            <div id="ec-leaflet-map"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ BEWERTUNGEN ════════════════════════ -->
+<section id="bewertungen" class="py-24 bg-surface-container-highest relative overflow-hidden">
+
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+      <!-- ── Linke Seite: Heading + Navigation ── -->
+      <div class="flex flex-col justify-center js-up" id="t-left-panel">
+
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[11px] font-bold tracking-wide font-label w-fit mb-6">
+          <svg class="w-3.5 h-3.5 fill-current flex-shrink-0" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Bewährt bei unseren Kunden
+        </div>
+
+        <h2 class="font-headline text-[2.6rem] md:text-[3.2rem] font-bold text-on-surface leading-tight mb-5">
+          Was unsere<br/>Kunden sagen
+        </h2>
+
+        <p class="font-body text-lg text-on-surface-variant leading-relaxed mb-8 max-w-sm">
+          Erfahrungen aus Häusern, die wir betreuen — ehrliche Stimmen von echten Kunden aus der Region.
+        </p>
+
+        <!-- Navigation Dots -->
+        <div class="flex items-center gap-3" id="t-dots"></div>
+
+        <!-- Google-Gesamtbewertung -->
+        <div class="flex items-center gap-4 mt-10 pt-8 border-t border-outline-variant/30">
+          <div class="font-display text-5xl font-semibold text-primary leading-none">5,0</div>
+          <div>
+            <div class="t-stars mb-1">★★★★★</div>
+            <div class="font-body text-xs text-on-surface-variant">Google-Bewertungen</div>
+          </div>
+          <svg class="w-5 h-5 ml-2 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ── Rechte Seite: Karten-Stack ── -->
+      <div class="js-up t-stack-outer" id="t-stack" style="transition-delay:0.1s">
+
+        <!-- Cards inserted by JS -->
+
+        <!-- Dekorative Quadrate -->
+        <div class="absolute -bottom-6 -left-6 w-24 h-24 rounded-2xl bg-primary/5 pointer-events-none"></div>
+        <div class="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-primary/5 pointer-events-none"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ CTA ════════════════════════ -->
+<section class="py-24 bg-primary relative overflow-hidden">
+  <svg class="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#n)"/>
+  </svg>
+  <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-on-primary opacity-[0.06] pointer-events-none"></div>
+  <div class="absolute -bottom-24 -left-24 w-[30rem] h-[30rem] rounded-full bg-on-primary opacity-[0.06] pointer-events-none"></div>
+
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12 text-center relative z-10">
+    <p class="font-display text-on-primary/55 text-xl font-light italic mb-3 js-up">Genießen Sie Ihre Freizeit —</p>
+    <h2 class="font-headline text-[2.8rem] md:text-[4rem] lg:text-[5rem] font-bold text-on-primary mb-10 leading-tight js-up">
+      Auf uns<br/>
+      <span class="font-display font-light italic">ist Verlass.</span>
+    </h2>
+    <a href="#anfrage" class="btn-shine inline-flex items-center gap-3 bg-surface text-primary px-10 py-5 rounded-2xl font-bold text-base hover:bg-secondary-fixed transition-all duration-300 shadow-2xl shadow-on-primary/25 group js-up">
+      Jetzt kostenloses Angebot anfordern
+      <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<!-- ════════════════════════ FOOTER ════════════════════════ -->
+<footer class="bg-on-surface py-16">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary text-[18px]" style="font-variation-settings:'FILL' 1">home_repair_service</span>
+          </div>
+          <span class="font-headline text-[1.1rem] font-bold text-inverse-on-surface">FS-Hausmeisterservice</span>
+        </div>
+        <p class="font-body text-inverse-on-surface/45 text-sm max-w-xs leading-relaxed">
+          Inhaber: Faruk Sijarina — Ihr zuverlässiger Partner für professionellen Hausmeisterservice in München und der Starnberger-See-Region.
+        </p>
+        <div class="mt-5 space-y-1.5">
+          <a href="tel:+4908151950013" class="flex items-center gap-2 text-inverse-on-surface/50 hover:text-primary transition-colors text-sm">
+            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">phone</span>08151 / 9500131
+          </a>
+          <a href="tel:+4917636243434" class="flex items-center gap-2 text-inverse-on-surface/50 hover:text-primary transition-colors text-sm">
+            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">smartphone</span>0176 / 36243434
+          </a>
+          <div class="flex items-center gap-2 text-inverse-on-surface/30 text-sm">
+            <span class="material-symbols-outlined text-[16px]">fax</span>08151 / 971812
+          </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <a href="#" class="w-9 h-9 rounded-full border border-inverse-on-surface/15 flex items-center justify-center hover:bg-primary hover:border-primary transition-all">
+            <span class="material-symbols-outlined text-inverse-on-surface/50 text-[18px]">language</span>
+          </a>
+          <a href="mailto:" class="w-9 h-9 rounded-full border border-inverse-on-surface/15 flex items-center justify-center hover:bg-primary hover:border-primary transition-all">
+            <span class="material-symbols-outlined text-inverse-on-surface/50 text-[18px]">mail</span>
+          </a>
+          <a href="tel:+4908151950013" class="w-9 h-9 rounded-full border border-inverse-on-surface/15 flex items-center justify-center hover:bg-primary hover:border-primary transition-all">
+            <span class="material-symbols-outlined text-inverse-on-surface/50 text-[18px]">phone</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h5 class="font-label text-[11px] font-bold text-inverse-on-surface/50 mb-5 uppercase tracking-[0.2em]">Leistungen</h5>
+        <ul class="space-y-3">
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Garten- &amp; Landschaftspflege</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Gebäude- &amp; Treppenhausreinigung</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Winterdienst</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Fenster- &amp; Dachrinnenreinigung</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Montagearbeiten &amp; Entrümpelung</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="font-label text-[11px] font-bold text-inverse-on-surface/50 mb-5 uppercase tracking-[0.2em]">Unternehmen</h5>
+        <ul class="space-y-3">
+          <li><a href="#einsatzgebiet" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Einsatzgebiet</a></li>
+          <li><a href="#ablauf" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">So funktioniert es</a></li>
+          <li><a href="#anfrage" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Kostenloses Angebot</a></li>
+          <li><a href="tel:+4908151950013" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Herrn Sijarina kontaktieren</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-inverse-on-surface/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-3">
+      <p class="font-body text-inverse-on-surface/35 text-xs">© 2024 FS-Hausmeisterservice · Faruk Sijarina. Alle Rechte vorbehalten.</p>
+      <div class="flex items-center gap-4">
+        <p class="font-body text-inverse-on-surface/25 text-xs">München · Starnberg · Weilheim und Region</p>
+        <a href="admin.html" class="font-body text-inverse-on-surface/15 text-xs hover:text-inverse-on-surface/40 transition-colors" title="Verwaltung">⚙</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════ JAVASCRIPT ════════════════════════ -->
+<script>
+// ── Mobile menu ──
+const menuBtn = document.getElementById('menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const menuIcon = document.getElementById('menu-icon');
+menuBtn.addEventListener('click', () => {
+  const open = mobileMenu.classList.toggle('open');
+  menuIcon.textContent = open ? 'close' : 'menu';
+});
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  mobileMenu.classList.remove('open');
+  menuIcon.textContent = 'menu';
+}));
+
+// ── Navbar scroll ──
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ── Animated Testimonials ──
+const testimonials = [
+  {
+    name: 'G. Bauer',
+    initials: 'GB',
+    role: 'Privatkundin',
+    service: 'Gartenpflege',
+    rating: 5,
+    quote: '„Herr Sijarina ist absolut zuverlässig! Unser Garten wird seit Jahren von ihm gepflegt — immer pünktlich, sauber und zu einem fairen Preis. Ich würde ihn jederzeit weiterempfehlen!"',
+  },
+  {
+    name: 'K. Hoffmann',
+    initials: 'KH',
+    role: 'Hausbesitzer',
+    service: 'Winterdienst',
+    rating: 5,
+    quote: '„Der Winterdienst war diesen Winter ein Segen. Egal wie früh es schneite — Eingang und Zufahrt waren immer geräumt und gestreut. Professionell, verlässlich und absolut empfehlenswert."',
+  },
+  {
+    name: 'S. Meier',
+    initials: 'SM',
+    role: 'WEG-Verwalterin',
+    service: 'Treppenhausreinigung',
+    rating: 5,
+    quote: '„Unser Treppenhaus wird regelmäßig von FS-Hausmeisterservice gereinigt — immer makellos und zuverlässig. Das Team arbeitet sorgfältig und mit einem freundlichen Auftreten. Top!"',
+  },
+  {
+    name: 'A. Weber',
+    initials: 'AW',
+    role: 'Privatkunde',
+    service: 'Komplettbetreuung',
+    rating: 5,
+    quote: '„Seit Jahren beauftrage ich FS-Hausmeisterservice für Gartenpflege und Grundreinigung. Die Qualität stimmt und die Zusammenarbeit ist unkompliziert. Immer wieder gerne!"',
+  },
+  {
+    name: 'T. Fischer',
+    initials: 'TF',
+    role: 'Immobilienbesitzer',
+    service: 'Fenster- & Dachrinnenreinigung',
+    rating: 5,
+    quote: '„Super schnelle Reaktionszeit, sehr professionell und faire Preise. Fenster- und Dachrinnenreinigung wurden gründlich und ohne jede Beanstandung erledigt. Absolute Empfehlung!"',
+  },
+];
+
+let currentT = 0;
+let tAutoTimer = null;
+
+function buildTestimonials() {
+  const stack = document.getElementById('t-stack');
+  const dotsContainer = document.getElementById('t-dots');
+
+  // Build cards
+  testimonials.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 't-card' + (i === 0 ? ' t-active' : '');
+    card.id = 't-card-' + i;
+    card.innerHTML = `
+      <div class="t-stars mb-5">${'★'.repeat(t.rating)}</div>
+      <div class="relative flex-1 mb-1">
+        <span class="t-quote-glyph" aria-hidden="true">"</span>
+        <p class="font-body text-lg text-on-surface leading-relaxed italic">${t.quote}</p>
+      </div>
+      <hr class="t-sep"/>
+      <div class="flex items-center gap-4">
+        <div class="t-avatar">${t.initials}</div>
+        <div>
+          <div class="font-headline font-bold text-on-surface text-base">${t.name}</div>
+          <div class="font-body text-sm text-on-surface-variant mt-0.5">${t.service} · ${t.role}</div>
+        </div>
+        <div class="ml-auto">
+          <svg class="w-4 h-4 opacity-40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+        </div>
+      </div>`;
+    // Insert before the decorative divs (last 2 children)
+    stack.insertBefore(card, stack.children[stack.children.length - 2]);
+  });
+
+  // Build dots
+  testimonials.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 't-dot' + (i === 0 ? ' t-dot-active' : '');
+    dot.setAttribute('aria-label', `Bewertung ${i + 1}`);
+    dot.addEventListener('click', () => switchT(i));
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function switchT(i) {
+  if (i === currentT) return;
+
+  // Deactivate current
+  const prevCard = document.getElementById('t-card-' + currentT);
+  if (prevCard) prevCard.classList.remove('t-active');
+
+  // Update dots
+  document.querySelectorAll('.t-dot').forEach((dot, idx) => {
+    dot.classList.toggle('t-dot-active', idx === i);
+  });
+
+  currentT = i;
+
+  // Activate new card (small delay so exit animation plays)
+  setTimeout(() => {
+    const nextCard = document.getElementById('t-card-' + currentT);
+    if (nextCard) nextCard.classList.add('t-active');
+  }, 40);
+
+  resetAutoRotate();
+}
+
+function resetAutoRotate() {
+  clearInterval(tAutoTimer);
+  tAutoTimer = setInterval(() => {
+    switchT((currentT + 1) % testimonials.length);
+  }, 6000);
+}
+
+buildTestimonials();
+resetAutoRotate();
+
+// ── Submission storage helpers ──
+function fsLoadSubmissions() {
+  try { return JSON.parse(localStorage.getItem('fs_submissions') || '[]'); } catch { return []; }
+}
+function fsSaveSubmissions(arr) {
+  localStorage.setItem('fs_submissions', JSON.stringify(arr));
+}
+function fsAddSubmission(data) {
+  const arr = fsLoadSubmissions();
+  arr.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    ts: new Date().toISOString(),
+    status: 'neu',
+    note: '',
+    ...data
+  });
+  fsSaveSubmissions(arr);
+}
+
+// ── Formspree endpoint ──
+const FS_ENDPOINT = 'https://formspree.io/f/mvzlvrvd';
+
+// ── Quote Form ──
+document.getElementById('quote-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn  = document.getElementById('form-btn');
+  const icon = document.getElementById('form-icon');
+
+  const name    = document.getElementById('qf-name').value.trim();
+  const email   = document.getElementById('qf-email').value.trim();
+  const phone   = document.getElementById('qf-phone').value.trim();
+  const service = document.getElementById('qf-service').value || 'Nicht angegeben';
+  const message = document.getElementById('qf-message').value.trim();
+
+  // Loading state
+  btn.disabled = true;
+  btn.childNodes[0].textContent = ' Wird gesendet… ';
+  icon.textContent = 'hourglass_empty';
+
+  try {
+    const res = await fetch(FS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject:  `Neue Anfrage von ${name} — ${service}`,
+        _replyto:  email,
+        name, email, phone, service, message,
+      })
+    });
+
+    if (res.ok) {
+      // Also save locally as backup
+      fsAddSubmission({ type: 'angebot', name, email, phone, service, message });
+      btn.style.background = '#4a7c59';
+      btn.childNodes[0].textContent = ' Anfrage gesendet! ';
+      icon.textContent = 'check_circle';
+      icon.style.fontVariationSettings = "'FILL' 1";
+      setTimeout(() => {
+        btn.style.background = '';
+        btn.childNodes[0].textContent = ' Anfrage absenden ';
+        icon.textContent = 'send';
+        icon.style.fontVariationSettings = '';
+        btn.disabled = false;
+        e.target.reset();
+      }, 3500);
+    } else {
+      throw new Error('Server error');
+    }
+  } catch {
+    btn.style.background = '#b91c1c';
+    btn.childNodes[0].textContent = ' Fehler — bitte erneut versuchen ';
+    icon.textContent = 'error';
+    setTimeout(() => {
+      btn.style.background = '';
+      btn.childNodes[0].textContent = ' Anfrage absenden ';
+      icon.textContent = 'send';
+      icon.style.fontVariationSettings = '';
+      btn.disabled = false;
+    }, 3500);
+  }
+});
+
+// ── Smooth scroll ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      const y = target.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  });
+});
+
+// ── Single expand-map card with Leaflet ──
+let ecMapInited = false;
+let ecLeafletMap = null;
+const ecMapCard = document.getElementById('ec-map-card');
+
+// 3D tilt only when not expanded
+ecMapCard.addEventListener('mousemove', e => {
+  if (ecMapCard.classList.contains('ec-expanded')) return;
+  const r = ecMapCard.getBoundingClientRect();
+  const mx = (e.clientX - r.left) / r.width  - 0.5;
+  const my = (e.clientY - r.top)  / r.height - 0.5;
+  ecMapCard.style.transform = `perspective(900px) rotateY(${mx * 9}deg) rotateX(${-my * 6}deg) scale(1.015)`;
+});
+ecMapCard.addEventListener('mouseleave', () => {
+  if (!ecMapCard.classList.contains('ec-expanded')) ecMapCard.style.transform = '';
+});
+
+// Auto-expand when section scrolls into view
+const ecObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !ecMapInited) {
+    ecMapInited = true;
+    ecMapCard.style.transform = '';
+    ecMapCard.classList.add('ec-expanded');
+    setTimeout(initEcLeaflet, 500);
+    ecObserver.disconnect();
+  }
+}, { threshold: 0.25 });
+ecObserver.observe(document.getElementById('einsatzgebiet'));
+
+function initEcLeaflet() {
+  const mapEl = document.getElementById('ec-leaflet-map');
+  ecLeafletMap = L.map(mapEl, {
+    center: [47.96, 11.29],
+    zoom: 10,
+    scrollWheelZoom: false,
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(ecLeafletMap);
+
+  const serviceLocations = [
+    { name: 'Gauting',    lat: 48.0608, lng: 11.3789 },
+    { name: 'Stockdorf',  lat: 48.0889, lng: 11.3708 },
+    { name: 'Starnberg',  lat: 47.9980, lng: 11.3410 },
+    { name: 'Berg',       lat: 47.9218, lng: 11.3225 },
+    { name: 'Pöcking',    lat: 47.9739, lng: 11.2978 },
+    { name: 'Feldafing',  lat: 47.9418, lng: 11.2969 },
+    { name: 'Herrsching', lat: 47.9979, lng: 11.1744 },
+    { name: 'Tutzing',    lat: 47.9093, lng: 11.2789 },
+    { name: 'Münsing',    lat: 47.8769, lng: 11.3069 },
+    { name: 'Weilheim',   lat: 47.8377, lng: 11.1513 },
+  ];
+
+  serviceLocations.forEach(loc => {
+    const icon = L.divIcon({
+      html: `<div style="position:relative;width:1px;height:1px">
+        <div style="
+          position:absolute;
+          white-space:nowrap;
+          transform:translateX(-50%) translateY(calc(-100% - 6px));
+          background:#faf6f0;
+          color:#2e3230;
+          border:1.5px solid rgba(196,200,188,0.85);
+          box-shadow:0 2px 10px rgba(46,50,48,0.14);
+          border-radius:9999px;
+          padding:5px 13px;
+          font-family:'Nunito Sans',sans-serif;
+          font-size:12px;
+          font-weight:700;
+          cursor:pointer;
+        ">${loc.name}</div>
+      </div>`,
+      className: '',
+      iconSize: [1, 1],
+      iconAnchor: [0, 0],
+    });
+
+    L.marker([loc.lat, loc.lng], { icon })
+      .addTo(ecLeafletMap)
+      .bindPopup(`
+        <div style="text-align:center;padding:2px 0">
+          <div style="font-family:'Literata',serif;font-size:15px;font-weight:700;color:#2e3230;margin-bottom:5px">${loc.name}</div>
+          <div style="font-family:'Nunito Sans',sans-serif;font-size:11px;color:#74796e;margin-bottom:10px">FS-Hausmeisterservice · Aktives Einsatzgebiet</div>
+          <a href="#anfrage" onclick="window.ecAnfrage();return false;" style="
+            display:inline-block;
+            background:#4a7c59;color:#fff;
+            padding:7px 18px;border-radius:9999px;
+            font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:700;
+            text-decoration:none;letter-spacing:0.04em;cursor:pointer;
+          ">Jetzt anfragen →</a>
+        </div>`, { className: 'ec-popup', maxWidth: 190, closeButton: false });
+  });
+}
+
+// Scroll to #anfrage from map popup + highlight
+window.ecAnfrage = function() {
+  if (ecLeafletMap) ecLeafletMap.closePopup();
+  const box = document.getElementById('anfrage');
+  const y = box.getBoundingClientRect().top + window.scrollY - 88;
+  window.scrollTo({ top: y, behavior: 'smooth' });
+  box.classList.remove('map-hl');
+  void box.offsetWidth;
+  box.classList.add('map-hl');
+  setTimeout(() => box.classList.remove('map-hl'), 2200);
+};
+
+// Location request form
+document.getElementById('location-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const val = document.getElementById('location-input').value.trim();
+  if (!val) return;
+  const msg = document.getElementById('location-form-msg');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  msg.textContent = 'Wird gesendet…';
+  msg.style.color = '#74796e';
+
+  try {
+    const res = await fetch(FS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `Gebietsanfrage: ${val}`,
+        service: 'Neues Einsatzgebiet',
+        message: `Anfrage für Ort/PLZ: ${val}`,
+      })
+    });
+    if (res.ok) {
+      fsAddSubmission({ type: 'standort', name: '—', email: '', phone: '', service: 'Neues Einsatzgebiet', message: `Anfrage für Ort/PLZ: ${val}` });
+      msg.textContent = `Vielen Dank! Wir prüfen die Verfügbarkeit für „${val}" und melden uns bei Ihnen.`;
+      msg.style.color = '#4a7c59';
+      e.target.reset();
+    } else { throw new Error(); }
+  } catch {
+    msg.textContent = 'Fehler beim Senden — bitte versuchen Sie es erneut.';
+    msg.style.color = '#b91c1c';
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// ── GSAP ──
+gsap.registerPlugin(ScrollTrigger);
+
+const heroTl = gsap.timeline({ delay: 0.25 });
+heroTl
+  .to('#h-eyebrow',  { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' })
+  .to('#h-headline', { opacity: 1, y: 0, duration: 1,   ease: 'power3.out' }, '-=0.5')
+  .to('#h-sub',      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.55')
+  .to('#h-cta',      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
+  .to('#h-stats',    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.45')
+  .to('#hero-ring',  { opacity: 1, duration: 1.2, ease: 'power2.out' }, '-=0.7');
+
+gsap.to('#anfrage', { opacity: 1, x: 0, duration: 1.1, ease: 'power3.out', delay: 0.6 });
+
+gsap.to('#hero-img', {
+  yPercent: 18, ease: 'none',
+  scrollTrigger: { trigger: 'body', start: 'top top', end: '35% top', scrub: 1 }
+});
+
+gsap.utils.toArray('.js-up').forEach(el => {
+  gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.js-fade').forEach(el => {
+  gsap.to(el, { opacity: 1, duration: 0.9, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.js-left').forEach(el => {
+  gsap.to(el, { opacity: 1, x: 0, duration: 0.8, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.js-right').forEach(el => {
+  gsap.to(el, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.js-scale').forEach(el => {
+  gsap.to(el, { opacity: 1, scale: 1, duration: 0.9, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.accent-line').forEach(el => {
+  gsap.to(el, { width: '3.5rem', duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+</script>
+</body>
+</html>
