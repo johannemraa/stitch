@@ -7,110 +7,171 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Nunito+Sans:opsz,wght@6..12,300..700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: 'Nunito Sans', sans-serif; }
-  .font-headline { font-family: 'Literata', Georgia, serif; }
-  input, textarea, button { font-family: 'Nunito Sans', sans-serif; }
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito Sans', sans-serif; background: #141716; color: #ddd9d1; height: 100dvh; overflow: hidden; }
+  .font-hl { font-family: 'Literata', Georgia, serif; }
+  input, button { font-family: 'Nunito Sans', sans-serif; }
+
+  /* Gates */
+  .gate {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #141716; z-index: 100;
+  }
+  .gate.hidden { display: none; }
+  .gate-box {
+    width: 100%; max-width: 360px; padding: 0 16px;
+  }
+  .gate-logo {
+    width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; border: 1px solid rgba(74,124,89,.28); background: rgba(74,124,89,.1);
+  }
+  .gate-logo svg { width: 22px; height: 22px; color: #4a7c59; }
+  .gate-title { font-family: 'Literata', serif; font-size: 1.35rem; font-weight: 700; color: #fff; text-align: center; }
+  .gate-sub { font-size: 12px; color: rgba(255,255,255,.3); text-align: center; margin-top: 4px; }
+  .gate-card {
+    margin-top: 28px; background: #1c1f1d; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 18px; padding: 24px;
+  }
+  .gate-input {
+    width: 100%; background: #242826; border: 1px solid rgba(255,255,255,.09); border-radius: 12px;
+    padding: 12px 16px; font-size: 13px; color: #ddd9d1; outline: none; transition: border-color .15s; margin-bottom: 10px;
+  }
+  .gate-input:focus { border-color: rgba(74,124,89,.5); }
+  .gate-input::placeholder { color: rgba(255,255,255,.22); }
+  .gate-btn {
+    width: 100%; background: #4a7c59; border: none; border-radius: 12px; padding: 12px;
+    font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: background .15s;
+  }
+  .gate-btn:hover { background: #3d6b4a; }
+  .gate-err { font-size: 11px; color: #f87171; text-align: center; margin-top: 8px; min-height: 16px; }
+  .gate-hint {
+    background: #242826; border: 1px solid rgba(255,255,255,.06); border-radius: 12px;
+    padding: 14px 16px; font-size: 11px; line-height: 1.7; color: rgba(255,255,255,.38); margin-bottom: 12px;
+  }
+  .gate-hint a { color: #8ecf9e; }
+  .gate-hint code { background: rgba(255,255,255,.1); border-radius: 4px; padding: 1px 5px; }
+  .gate-hint strong { color: rgba(255,255,255,.6); font-weight: 700; }
+
+  /* App shell */
+  #app { display: none; flex-direction: column; height: 100dvh; }
+  #app.visible { display: flex; }
+
+  /* Toolbar */
+  #toolbar {
+    height: 50px; flex-shrink: 0;
+    background: #191c1a; border-bottom: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 20px; gap: 16px;
+  }
+  .tb-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .tb-logo {
+    width: 28px; height: 28px; border-radius: 8px; background: #4a7c59;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .tb-logo svg { width: 14px; height: 14px; color: #fff; }
+  .tb-name { font-weight: 700; font-size: 13px; color: #fff; }
+  .tb-sep { color: rgba(255,255,255,.15); font-size: 13px; }
+  .tb-hint { font-size: 11px; color: rgba(255,255,255,.28); }
+  .tb-center { flex: 1; display: flex; justify-content: center; }
+  .tb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  #tb-status { font-size: 11px; color: rgba(255,255,255,.3); white-space: nowrap; transition: color .3s; }
+  #tb-status.ok { color: #8ecf9e; }
+  #tb-status.err { color: #f87171; }
+  .tb-img-label {
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 10px;
+    padding: 6px 12px; font-size: 12px; color: rgba(255,255,255,.6); transition: all .15s;
+  }
+  .tb-img-label:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .tb-img-label svg { width: 14px; height: 14px; }
+  .tb-pub {
+    display: flex; align-items: center; gap: 6px;
+    background: #4a7c59; border: none; border-radius: 10px;
+    padding: 7px 14px; font-size: 12px; font-weight: 700; color: #fff;
+    cursor: pointer; transition: background .15s;
+  }
+  .tb-pub:hover:not(:disabled) { background: #3d6b4a; }
+  .tb-pub:disabled { opacity: .45; cursor: not-allowed; }
+  .tb-pub svg { width: 13px; height: 13px; }
+
+  /* Iframe */
+  #frame-wrap { flex: 1; overflow: hidden; position: relative; }
+  #frame {
+    width: 100%; height: 100%; border: none; display: block;
+    background: #faf6f0;
+  }
+  #frame-loader {
+    position: absolute; inset: 0; background: #faf6f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: rgba(46,50,48,.35); font-family: 'Nunito Sans', sans-serif;
+    transition: opacity .3s;
+  }
+  #frame-loader.hidden { opacity: 0; pointer-events: none; }
 </style>
 </head>
-<body class="bg-[#141716] text-[#ddd9d1] overflow-hidden" style="height:100dvh">
+<body>
 
-<!-- ═══════════════════════════ PASSWORD GATE ═══════════════════════════ -->
-<div id="gate" class="fixed inset-0 flex items-center justify-center z-50" style="background:#141716">
-  <div class="w-full max-w-[340px] px-4">
-    <div class="text-center mb-8">
-      <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5 border"
-           style="background:rgba(74,124,89,0.12);border-color:rgba(74,124,89,0.25)">
-        <svg class="w-5 h-5" style="color:#4a7c59" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
-        </svg>
-      </div>
-      <h1 class="font-headline text-[1.4rem] font-bold text-white">FS Editor</h1>
-      <p class="text-xs mt-1" style="color:rgba(255,255,255,0.3)">Zugangscode eingeben</p>
+<!-- ─── PASSWORD GATE ─────────────────────────────────── -->
+<div class="gate" id="gate-pw">
+  <div class="gate-box">
+    <div class="gate-logo">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+      </svg>
     </div>
-    <div class="rounded-2xl p-5 border" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
-      <input type="password" id="pw-input" placeholder="Passwort" autocomplete="off"
-        class="w-full rounded-xl px-4 py-3 text-sm text-white border focus:outline-none transition-colors mb-3"
-        style="background:#232725;border-color:rgba(255,255,255,0.09);color:#e0dbd3"
-        onfocus="this.style.borderColor='rgba(74,124,89,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.09)'"/>
-      <button onclick="unlock()"
-        class="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
-        style="background:#4a7c59"
-        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
-        Anmelden
-      </button>
-      <p id="pw-err" class="text-xs text-center mt-2 hidden" style="color:#f87171">Falsches Passwort</p>
+    <p class="gate-title font-hl">FS Editor</p>
+    <p class="gate-sub">Zugangscode eingeben</p>
+    <div class="gate-card">
+      <input class="gate-input" type="password" id="pw-in" placeholder="Passwort" autocomplete="off"/>
+      <button class="gate-btn" onclick="unlock()">Anmelden</button>
+      <p class="gate-err" id="pw-err"></p>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════ TOKEN GATE ═══════════════════════════ -->
-<div id="token-gate" class="fixed inset-0 flex items-center justify-center z-40 hidden" style="background:rgba(20,23,22,0.96)">
-  <div class="w-full max-w-[420px] px-4">
-    <div class="rounded-2xl p-7 border" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
-      <h2 class="font-headline text-lg font-bold text-white mb-1">GitHub Token</h2>
-      <p class="text-xs mb-5" style="color:rgba(255,255,255,0.35)">Zum Speichern von Änderungen benötigt. Wird nur für diese Sitzung gespeichert.</p>
-
-      <div class="rounded-xl p-4 mb-5 text-xs leading-relaxed border"
-           style="background:#232725;border-color:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4)">
-        <span style="color:rgba(255,255,255,0.6);font-weight:700">Token erstellen:</span><br/>
-        1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=FS+Editor" target="_blank"
-              style="color:#8ecf9e" class="hover:underline">github.com → Settings → Tokens → New</a><br/>
-        2. Scope <code class="rounded px-1" style="background:rgba(255,255,255,0.1)">repo</code> ankreuzen, dann generieren<br/>
+<!-- ─── TOKEN GATE ────────────────────────────────────── -->
+<div class="gate hidden" id="gate-tok">
+  <div class="gate-box" style="max-width:420px">
+    <p class="gate-title font-hl">GitHub Token</p>
+    <p class="gate-sub" style="margin-bottom:0">Zum Speichern benötigt · nur für diese Sitzung</p>
+    <div class="gate-card">
+      <div class="gate-hint">
+        <strong>Token erstellen:</strong><br/>
+        1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=FS+Editor" target="_blank">github.com → Settings → Tokens → New classic token</a><br/>
+        2. Scope <code>repo</code> ankreuzen → Generate<br/>
         3. Token kopieren und unten einfügen
       </div>
-
-      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"
-        class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors mb-3 font-mono"
-        style="background:#232725;border-color:rgba(255,255,255,0.09);color:#8ecf9e"
-        onfocus="this.style.borderColor='rgba(74,124,89,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.09)'"/>
-      <button onclick="saveToken()"
-        class="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
-        style="background:#4a7c59"
-        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
-        Verbinden &amp; weiter
-      </button>
-      <p id="token-err" class="text-xs text-center mt-2 hidden" style="color:#f87171">Token eingeben</p>
+      <input class="gate-input" type="password" id="tok-in" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-family:monospace;color:#8ecf9e"/>
+      <button class="gate-btn" onclick="saveToken()">Verbinden &amp; weiter</button>
+      <p class="gate-err" id="tok-err"></p>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════ MAIN APP ═══════════════════════════ -->
-<div id="app" class="hidden flex flex-col" style="height:100dvh">
-
-  <!-- Topbar -->
-  <div class="flex items-center justify-between px-5 flex-shrink-0 border-b"
-       style="height:52px;background:#191c1a;border-color:rgba(255,255,255,0.06)">
-    <div class="flex items-center gap-3">
-      <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#4a7c59">
-        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+<!-- ─── APP ───────────────────────────────────────────── -->
+<div id="app">
+  <div id="toolbar">
+    <div class="tb-left">
+      <div class="tb-logo">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
         </svg>
       </div>
-      <span class="font-bold text-sm text-white">FS Editor</span>
-      <span class="text-sm" style="color:rgba(255,255,255,0.15)">·</span>
-      <a href="/" target="_blank"
-         class="text-xs flex items-center gap-1 transition-colors"
-         style="color:rgba(255,255,255,0.25)"
-         onmouseover="this.style.color='rgba(255,255,255,0.55)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">
-        Website ansehen
-        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-        </svg>
-      </a>
+      <span class="tb-name">FS Editor</span>
+      <span class="tb-sep">·</span>
+      <span class="tb-hint">Text anklicken zum Bearbeiten</span>
     </div>
-    <div class="flex items-center gap-4">
-      <span id="status" class="text-xs transition-all" style="color:rgba(255,255,255,0.25)"></span>
-      <button id="pub-btn" onclick="publish()"
-        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white transition-all"
-        style="background:#4a7c59"
-        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <div class="tb-right">
+      <span id="tb-status"></span>
+      <label class="tb-img-label" title="Hintergrundbild der Hero-Sektion ersetzen">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+        </svg>
+        Hintergrundbild
+        <input type="file" id="img-in" accept="image/*" style="display:none" onchange="onImgPick(this)"/>
+      </label>
+      <button class="tb-pub" id="pub-btn" onclick="publish()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"/>
         </svg>
         Veröffentlichen
@@ -118,272 +179,253 @@
     </div>
   </div>
 
-  <!-- Body -->
-  <div class="flex flex-1 overflow-hidden">
-
-    <!-- Sidebar -->
-    <div class="flex flex-col overflow-y-auto flex-shrink-0 border-r"
-         style="width:196px;background:#191c1a;border-color:rgba(255,255,255,0.06)">
-      <div class="p-3 pt-5">
-        <p class="text-[10px] font-bold uppercase tracking-[0.15em] px-3 mb-2" style="color:rgba(255,255,255,0.2)">Bereiche</p>
-        <nav id="nav" class="space-y-0.5"></nav>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div class="flex-1 overflow-y-auto" style="background:#141716">
-      <div class="max-w-2xl mx-auto px-8 py-10" id="content"></div>
-    </div>
-
+  <div id="frame-wrap">
+    <div id="frame-loader">Seite wird geladen…</div>
+    <iframe id="frame" title="Editor"></iframe>
   </div>
 </div>
 
-<!-- ═══════════════════════════ SCRIPT ═══════════════════════════ -->
 <script>
-// ── Config ───────────────────────────────────────────────────────────────
-const PW       = 'Stitch2026';      // Change this line to update the password
+// ─── Config ───────────────────────────────────────────────────────────────
+const PW       = 'Stitch2026';       // ← Passwort hier ändern
 const REPO     = 'johannemraa/stitch';
 const HTMLFILE = 'index.html';
 const IMGFILE  = 'background_image.png';
 
-// ── State ────────────────────────────────────────────────────────────────
+// ─── State ────────────────────────────────────────────────────────────────
 let rawHtml      = '';
 let ghToken      = '';
-let activeId     = 'hero';
-let fieldCache   = {};   // key → current edited value (survives section switches)
+let edits        = {};   // key → new plain-text value (from iframe postMessage)
 let pendingImage = null;
 
-// ── Section definitions ───────────────────────────────────────────────────
-const SECTIONS = [
-  {
-    id: 'hero', label: 'Hero-Bereich',
-    fields: [
-      { key: 'hero-eyebrow',  label: 'Eyebrow-Text',                hint: 'Kleine Zeile über der Hauptüberschrift', type: 'text'     },
-      { key: 'hero-h1-1',    label: 'Überschrift — Zeile 1',                                                        type: 'text'     },
-      { key: 'hero-display', label: 'Überschrift — Highlight (kursiv)',                                              type: 'text'     },
-      { key: 'hero-h1-2',    label: 'Überschrift — Zeile 3',                                                        type: 'text'     },
-      { key: 'hero-sub',     label: 'Untertitel',                                                                    type: 'textarea' },
-      { key: '__img',        label: 'Hintergrundbild',                                                               type: 'image'    },
-    ]
-  },
-  {
-    id: 'services', label: 'Leistungen',
-    fields: [
-      { key: 'svc-01-title', label: 'Leistung 01 — Titel',        type: 'text'     },
-      { key: 'svc-01-desc',  label: 'Leistung 01 — Beschreibung', type: 'textarea' },
-      { key: 'svc-02-title', label: 'Leistung 02 — Titel',        type: 'text'     },
-      { key: 'svc-02-desc',  label: 'Leistung 02 — Beschreibung', type: 'textarea' },
-      { key: 'svc-03-title', label: 'Leistung 03 — Titel',        type: 'text'     },
-      { key: 'svc-03-desc',  label: 'Leistung 03 — Beschreibung', type: 'textarea' },
-      { key: 'svc-04-title', label: 'Leistung 04 — Titel',        type: 'text'     },
-      { key: 'svc-04-desc',  label: 'Leistung 04 — Beschreibung', type: 'textarea' },
-      { key: 'svc-05-title', label: 'Leistung 05 — Titel',        type: 'text'     },
-      { key: 'svc-05-desc',  label: 'Leistung 05 — Beschreibung', type: 'textarea' },
-      { key: 'svc-06-title', label: 'Leistung 06 — Titel',        type: 'text'     },
-      { key: 'svc-06-desc',  label: 'Leistung 06 — Beschreibung', type: 'textarea' },
-    ]
-  },
-  {
-    id: 'einsatz', label: 'Einsatzgebiet',
-    fields: [
-      { key: 'einsatz-sub', label: 'Untertitel', type: 'textarea' },
-    ]
-  },
-];
-
-// ── Auth ─────────────────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────────
 function unlock() {
-  if (document.getElementById('pw-input').value === PW) {
-    document.getElementById('gate').remove();
-    const saved = sessionStorage.getItem('fs_tok');
-    if (saved) { ghToken = saved; initApp(); }
-    else { document.getElementById('token-gate').classList.remove('hidden'); }
+  if (document.getElementById('pw-in').value === PW) {
+    document.getElementById('gate-pw').classList.add('hidden');
+    const t = sessionStorage.getItem('fs_tok');
+    if (t) { ghToken = t; initApp(); }
+    else    { document.getElementById('gate-tok').classList.remove('hidden'); }
   } else {
-    const e = document.getElementById('pw-err');
-    e.classList.remove('hidden');
-    setTimeout(() => e.classList.add('hidden'), 2500);
+    showErr('pw-err', 'Falsches Passwort');
   }
 }
 
 function saveToken() {
-  const v = document.getElementById('token-input').value.trim();
-  if (!v) { document.getElementById('token-err').classList.remove('hidden'); return; }
+  const v = document.getElementById('tok-in').value.trim();
+  if (!v) { showErr('tok-err', 'Bitte Token eingeben'); return; }
   ghToken = v;
   sessionStorage.setItem('fs_tok', ghToken);
-  document.getElementById('token-gate').classList.add('hidden');
+  document.getElementById('gate-tok').classList.add('hidden');
   initApp();
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  setTimeout(() => el.textContent = '', 3000);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
 async function initApp() {
-  document.getElementById('app').classList.remove('hidden');
-  setStatus('Lade Inhalt…');
+  document.getElementById('app').classList.add('visible');
+  setStatus('Lade…');
   try {
     const data = await ghGet(HTMLFILE);
     rawHtml = decode64(data.content);
-    renderNav();
-    showSection('hero');
+    loadFrame(rawHtml);
     setStatus('');
   } catch(e) {
-    setStatus('Ladefehler — Token prüfen');
+    setStatus('Ladefehler — Token prüfen', 'err');
   }
 }
 
-// ── Nav ───────────────────────────────────────────────────────────────────
-const NAV_ICONS = {
-  hero:     '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>',
-  services: '<path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/>',
-  einsatz:  '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>',
-};
-
-function renderNav() {
-  document.getElementById('nav').innerHTML = SECTIONS.map(s => `
-    <button onclick="showSection('${s.id}')" id="nav-${s.id}"
-      class="w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 transition-all"
-      style="color:rgba(255,255,255,0.4)">
-      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-        ${NAV_ICONS[s.id] || ''}
-      </svg>
-      <span>${s.label}</span>
-    </button>
-  `).join('');
-  setNavActive('hero');
-}
-
-function setNavActive(id) {
-  SECTIONS.forEach(s => {
-    const btn = document.getElementById(`nav-${s.id}`);
-    if (!btn) return;
-    if (s.id === id) {
-      btn.style.background = 'rgba(74,124,89,0.14)';
-      btn.style.color = '#8ecf9e';
-    } else {
-      btn.style.background = '';
-      btn.style.color = 'rgba(255,255,255,0.4)';
-      btn.onmouseover = () => { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.color = 'rgba(255,255,255,0.75)'; };
-      btn.onmouseout  = () => { btn.style.background = ''; btn.style.color = 'rgba(255,255,255,0.4)'; };
-    }
-  });
-}
-
-// ── Section rendering ─────────────────────────────────────────────────────
-function showSection(id) {
-  flushDomToCache();
-  activeId = id;
-  setNavActive(id);
-  const s = SECTIONS.find(s => s.id === id);
-  const area = document.getElementById('content');
-  area.innerHTML = `
-    <div class="pb-6 mb-8 border-b" style="border-color:rgba(255,255,255,0.06)">
-      <h2 class="font-headline text-2xl font-bold text-white">${s.label}</h2>
-      <p class="text-sm mt-1" style="color:rgba(255,255,255,0.28)">Änderungen werden nach „Veröffentlichen" live geschaltet.</p>
-    </div>
-    <div class="space-y-5">${s.fields.map(buildField).join('')}</div>
-  `;
-  const imgIn = document.getElementById('img-input');
-  if (imgIn) imgIn.addEventListener('change', onImagePick);
-}
-
-function buildField(f) {
-  if (f.type === 'image') {
-    return `
-      <div class="rounded-xl border p-5" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
-        <p class="text-[11px] font-bold uppercase tracking-[0.13em] mb-3" style="color:rgba(255,255,255,0.28)">${f.label}</p>
-        <img id="img-preview" src="background_image.png" alt=""
-          class="w-full rounded-lg mb-4 object-cover" style="height:140px;opacity:0.7"
-          onerror="this.style.display='none'"/>
-        <label class="inline-flex items-center gap-2 cursor-pointer rounded-lg px-4 py-2.5 text-sm transition-all"
-               style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.65)"
-               onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-          </svg>
-          Bild wählen
-          <input type="file" id="img-input" accept="image/*" class="hidden"/>
-        </label>
-        <span id="img-name" class="text-xs ml-2" style="color:rgba(255,255,255,0.25)"></span>
-      </div>`;
+// ─── Prepare HTML for iframe ──────────────────────────────────────────────
+function prepareHtml(html) {
+  // Remove Leaflet CSS + JS
+  html = html.replace(/<link[^>]*leaflet[^>]*>/gi, '');
+  html = html.replace(/<script[^>]*leaflet[^>]*><\/script>/gi, '');
+  // Remove GSAP
+  html = html.replace(/<script[^>]*gsap[^>]*><\/script>/gi, '');
+  // Remove the main inline <script> block (last one in <body>)
+  const lastOpen  = html.lastIndexOf('<script>');
+  const lastClose = html.lastIndexOf('</script>');
+  if (lastOpen !== -1 && lastClose > lastOpen) {
+    html = html.slice(0, lastOpen) + html.slice(lastClose + 9);
   }
+  // Convert EDIT markers → clickable spans
+  html = html.replace(
+    /<!-- EDIT:([\w-]+) -->([\s\S]*?)<!-- \/EDIT:\1 -->/g,
+    (_, key, content) => `<span data-edit="${key}">${content.trim()}</span>`
+  );
+  // Inject editor styles + script before </body>
+  html = html.replace('</body>', EDITOR_INJECT + '\n</body>');
+  return html;
+}
 
-  const id  = `f-${f.key}`;
-  const val = escHtml(getVal(f.key));
-  const inputStyle = `background:#1c1f1d;border-color:rgba(255,255,255,0.08);color:#ddd9d1`;
-  const focusHandlers = `onfocus="this.style.borderColor='rgba(74,124,89,0.45)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'"`;
+// ─── Injected code (runs inside iframe) ───────────────────────────────────
+const EDITOR_INJECT = `
+<style>
+  /* Show elements that rely on JS scroll animations */
+  .js-up,.js-right,.js-fade{opacity:1!important;transform:none!important;}
+  /* Editable element styles */
+  [data-edit]{
+    cursor:text!important;
+    outline:2px solid transparent;
+    outline-offset:3px;
+    border-radius:3px;
+    transition:outline-color .12s;
+  }
+  [data-edit]:hover{outline-color:rgba(74,124,89,.38)!important;}
+  [data-edit][contenteditable="true"]{
+    outline-color:rgba(74,124,89,.75)!important;
+    outline-offset:4px;
+  }
+  /* Tooltip */
+  .fs-tip{
+    position:fixed;
+    background:#1c1f1d;
+    color:#ddd9d1;
+    font:600 11px/1 'Nunito Sans',sans-serif;
+    padding:5px 10px;
+    border-radius:7px;
+    pointer-events:none;
+    z-index:99999;
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .12s;
+    box-shadow:0 2px 10px rgba(0,0,0,.35);
+  }
+</style>
+<script>
+(function(){
+  // Block form submissions and external link navigations
+  document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
+  document.querySelectorAll('a:not([href^="#"])').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
 
-  return `
-    <div>
-      <label for="${id}" class="block text-[11px] font-bold uppercase tracking-[0.13em] mb-2" style="color:rgba(255,255,255,0.28)">${f.label}</label>
-      ${f.hint ? `<p class="text-xs mb-2" style="color:rgba(255,255,255,0.2)">${f.hint}</p>` : ''}
-      ${f.type === 'textarea'
-        ? `<textarea id="${id}" rows="3" class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors resize-y leading-relaxed" style="${inputStyle}" ${focusHandlers}>${val}</textarea>`
-        : `<input type="text" id="${id}" value="${val}" class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors" style="${inputStyle}" ${focusHandlers}/>`
+  // Tooltip
+  const tip = document.createElement('div');
+  tip.className = 'fs-tip';
+  tip.textContent = 'Klicken zum Bearbeiten';
+  document.body.appendChild(tip);
+
+  let cur = null;
+
+  document.querySelectorAll('[data-edit]').forEach(el=>{
+    el.addEventListener('mouseenter', e=>{
+      if(el===cur) return;
+      tip.style.opacity='1';
+      positionTip(e);
+    });
+    el.addEventListener('mousemove', positionTip);
+    el.addEventListener('mouseleave', ()=>{ tip.style.opacity='0'; });
+
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      tip.style.opacity='0';
+      if(cur && cur!==el) commitEl(cur);
+      cur = el;
+      el.contentEditable = 'true';
+      el.focus();
+      // Select all text
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    });
+
+    el.addEventListener('blur', ()=>{
+      if(cur===el){
+        commitEl(el);
+        el.contentEditable = 'inherit';
+        cur = null;
       }
-    </div>`;
+    });
+
+    el.addEventListener('keydown', e=>{
+      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); el.blur(); }
+      if(e.key==='Escape') el.blur();
+    });
+  });
+
+  document.addEventListener('click', e=>{
+    if(cur && !e.target.closest('[data-edit]')) cur.blur();
+  });
+
+  function commitEl(el){
+    window.parent.postMessage({ type:'edit', key:el.dataset.edit, value:el.innerText.trim() }, '*');
+  }
+
+  function positionTip(e){
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top  = (e.clientY - 34) + 'px';
+  }
+
+  window.parent.postMessage({ type:'ready' }, '*');
+})();
+<\/script>`;
+
+// ─── Load iframe ──────────────────────────────────────────────────────────
+function loadFrame(html) {
+  const prepared = prepareHtml(html);
+  const frame    = document.getElementById('frame');
+  const loader   = document.getElementById('frame-loader');
+  frame.srcdoc   = prepared;
+  frame.onload   = () => loader.classList.add('hidden');
 }
 
-// ── Field cache ───────────────────────────────────────────────────────────
-function flushDomToCache() {
-  SECTIONS.forEach(s => s.fields.forEach(f => {
-    if (f.type === 'image') return;
-    const el = document.getElementById(`f-${f.key}`);
-    if (el) fieldCache[f.key] = el.value;
-  }));
-}
+// ─── Handle messages from iframe ─────────────────────────────────────────
+window.addEventListener('message', e => {
+  if (!e.data) return;
+  if (e.data.type === 'edit') {
+    edits[e.data.key] = e.data.value;
+  }
+  if (e.data.type === 'ready') {
+    document.getElementById('frame-loader').classList.add('hidden');
+  }
+});
 
-function getVal(key) {
-  if (fieldCache[key] !== undefined) return fieldCache[key];
-  return decodeEnts(extract(rawHtml, key));
-}
-
-// ── Image pick ────────────────────────────────────────────────────────────
-function onImagePick(e) {
-  const file = e.target.files[0];
+// ─── Image pick ───────────────────────────────────────────────────────────
+function onImgPick(input) {
+  const file = input.files[0];
   if (!file) return;
   pendingImage = file;
-  document.getElementById('img-name').textContent = file.name;
-  const r = new FileReader();
-  r.onload = ev => {
-    const p = document.getElementById('img-preview');
-    if (p) { p.src = ev.target.result; p.style.display = 'block'; }
-  };
-  r.readAsDataURL(file);
+  setStatus('Bild ausgewählt: ' + file.name);
+  input.value = '';
 }
 
-// ── Publish ───────────────────────────────────────────────────────────────
+// ─── Publish ──────────────────────────────────────────────────────────────
 async function publish() {
-  flushDomToCache();
   const btn = document.getElementById('pub-btn');
   btn.disabled = true;
-  btn.style.opacity = '0.5';
   try {
     let html = rawHtml;
-    SECTIONS.forEach(s => s.fields.forEach(f => {
-      if (f.type === 'image') return;
-      const val = fieldCache[f.key] !== undefined ? fieldCache[f.key] : decodeEnts(extract(rawHtml, f.key));
-      html = update(html, f.key, encodeEnts(val));
-    }));
 
+    // Apply all collected text edits
+    for (const [key, val] of Object.entries(edits)) {
+      html = updateMarker(html, key, encodeEnts(val));
+    }
+
+    // Upload image if picked
     if (pendingImage) {
       setStatus('Bild wird hochgeladen…');
       await uploadImage(pendingImage);
+      pendingImage = null;
     }
 
     setStatus('Wird gespeichert…');
     await commitFile(HTMLFILE, html, 'Inhalt aktualisiert via FS Editor');
     rawHtml = html;
-    pendingImage = null;
-    const n = document.getElementById('img-name');
-    if (n) n.textContent = '';
-    setStatus('✓ Veröffentlicht — Vercel deployt in ~30 Sek.');
+    edits   = {};
+    setStatus('✓ Veröffentlicht — Vercel deployt in ~30 Sek.', 'ok');
     setTimeout(() => setStatus(''), 8000);
   } catch(e) {
-    setStatus('Fehler: ' + e.message);
+    setStatus('Fehler: ' + e.message, 'err');
   }
   btn.disabled = false;
-  btn.style.opacity = '';
 }
 
-// ── GitHub helpers ────────────────────────────────────────────────────────
+// ─── GitHub helpers ───────────────────────────────────────────────────────
 async function ghGet(path) {
   const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
     headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' }
@@ -393,12 +435,11 @@ async function ghGet(path) {
 }
 
 async function commitFile(path, content, message) {
-  const file    = await ghGet(path);
-  const encoded = encode64(content);
+  const file = await ghGet(path);
   const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
     method: 'PUT',
     headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, content: encoded, sha: file.sha })
+    body: JSON.stringify({ message, content: encode64(content), sha: file.sha })
   });
   if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Commit fehlgeschlagen'); }
 }
@@ -422,27 +463,16 @@ async function uploadImage(file) {
   if (!r.ok) throw new Error('Bild-Upload fehlgeschlagen');
 }
 
-// ── Content helpers ───────────────────────────────────────────────────────
-function extract(html, key) {
-  const m = html.match(new RegExp(`<!-- EDIT:${key} -->([\\s\\S]*?)<!-- /EDIT:${key} -->`));
-  return m ? m[1].trim() : '';
-}
-
-function update(html, key, value) {
+// ─── Content helpers ──────────────────────────────────────────────────────
+function updateMarker(html, key, value) {
   return html.replace(
     new RegExp(`<!-- EDIT:${key} -->[\\s\\S]*?<!-- /EDIT:${key} -->`),
     `<!-- EDIT:${key} -->${value}<!-- /EDIT:${key} -->`
   );
 }
 
-function decodeEnts(s) {
-  const d = document.createElement('div'); d.innerHTML = s; return d.textContent || '';
-}
 function encodeEnts(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-function escHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function encode64(str) {
@@ -451,19 +481,24 @@ function encode64(str) {
   bytes.forEach(b => bin += String.fromCharCode(b));
   return btoa(bin);
 }
+
 function decode64(b64) {
-  const bin  = atob(b64.replace(/\n/g, ''));
+  const bin   = atob(b64.replace(/\n/g, ''));
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
 
-function setStatus(msg) { document.getElementById('status').textContent = msg; }
+function setStatus(msg, type = '') {
+  const el = document.getElementById('tb-status');
+  el.textContent = msg;
+  el.className = type;
+}
 
-// ── Keyboard shortcuts ────────────────────────────────────────────────────
+// ─── Keyboard shortcuts ───────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    if (document.getElementById('gate') && document.activeElement?.id === 'pw-input')    { unlock();    }
-    if (!document.getElementById('token-gate')?.classList.contains('hidden') && document.activeElement?.id === 'token-input') { saveToken(); }
+    if (!document.getElementById('gate-pw').classList.contains('hidden') && document.activeElement?.id === 'pw-in')  { unlock();    }
+    if (!document.getElementById('gate-tok').classList.contains('hidden') && document.activeElement?.id === 'tok-in') { saveToken(); }
   }
 });
 </script>
