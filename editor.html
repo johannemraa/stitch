@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FS Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Nunito+Sans:opsz,wght@6..12,300..700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: 'Nunito Sans', sans-serif; }
+  .font-headline { font-family: 'Literata', Georgia, serif; }
+  input, textarea, button { font-family: 'Nunito Sans', sans-serif; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+</style>
+</head>
+<body class="bg-[#141716] text-[#ddd9d1] overflow-hidden" style="height:100dvh">
+
+<!-- ═══════════════════════════ PASSWORD GATE ═══════════════════════════ -->
+<div id="gate" class="fixed inset-0 flex items-center justify-center z-50" style="background:#141716">
+  <div class="w-full max-w-[340px] px-4">
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5 border"
+           style="background:rgba(74,124,89,0.12);border-color:rgba(74,124,89,0.25)">
+        <svg class="w-5 h-5" style="color:#4a7c59" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+        </svg>
+      </div>
+      <h1 class="font-headline text-[1.4rem] font-bold text-white">FS Editor</h1>
+      <p class="text-xs mt-1" style="color:rgba(255,255,255,0.3)">Zugangscode eingeben</p>
+    </div>
+    <div class="rounded-2xl p-5 border" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
+      <input type="password" id="pw-input" placeholder="Passwort" autocomplete="off"
+        class="w-full rounded-xl px-4 py-3 text-sm text-white border focus:outline-none transition-colors mb-3"
+        style="background:#232725;border-color:rgba(255,255,255,0.09);color:#e0dbd3"
+        onfocus="this.style.borderColor='rgba(74,124,89,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.09)'"/>
+      <button onclick="unlock()"
+        class="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
+        style="background:#4a7c59"
+        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
+        Anmelden
+      </button>
+      <p id="pw-err" class="text-xs text-center mt-2 hidden" style="color:#f87171">Falsches Passwort</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TOKEN GATE ═══════════════════════════ -->
+<div id="token-gate" class="fixed inset-0 flex items-center justify-center z-40 hidden" style="background:rgba(20,23,22,0.96)">
+  <div class="w-full max-w-[420px] px-4">
+    <div class="rounded-2xl p-7 border" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
+      <h2 class="font-headline text-lg font-bold text-white mb-1">GitHub Token</h2>
+      <p class="text-xs mb-5" style="color:rgba(255,255,255,0.35)">Zum Speichern von Änderungen benötigt. Wird nur für diese Sitzung gespeichert.</p>
+
+      <div class="rounded-xl p-4 mb-5 text-xs leading-relaxed border"
+           style="background:#232725;border-color:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4)">
+        <span style="color:rgba(255,255,255,0.6);font-weight:700">Token erstellen:</span><br/>
+        1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=FS+Editor" target="_blank"
+              style="color:#8ecf9e" class="hover:underline">github.com → Settings → Tokens → New</a><br/>
+        2. Scope <code class="rounded px-1" style="background:rgba(255,255,255,0.1)">repo</code> ankreuzen, dann generieren<br/>
+        3. Token kopieren und unten einfügen
+      </div>
+
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"
+        class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors mb-3 font-mono"
+        style="background:#232725;border-color:rgba(255,255,255,0.09);color:#8ecf9e"
+        onfocus="this.style.borderColor='rgba(74,124,89,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.09)'"/>
+      <button onclick="saveToken()"
+        class="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
+        style="background:#4a7c59"
+        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
+        Verbinden &amp; weiter
+      </button>
+      <p id="token-err" class="text-xs text-center mt-2 hidden" style="color:#f87171">Token eingeben</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MAIN APP ═══════════════════════════ -->
+<div id="app" class="hidden flex flex-col" style="height:100dvh">
+
+  <!-- Topbar -->
+  <div class="flex items-center justify-between px-5 flex-shrink-0 border-b"
+       style="height:52px;background:#191c1a;border-color:rgba(255,255,255,0.06)">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#4a7c59">
+        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+        </svg>
+      </div>
+      <span class="font-bold text-sm text-white">FS Editor</span>
+      <span class="text-sm" style="color:rgba(255,255,255,0.15)">·</span>
+      <a href="/" target="_blank"
+         class="text-xs flex items-center gap-1 transition-colors"
+         style="color:rgba(255,255,255,0.25)"
+         onmouseover="this.style.color='rgba(255,255,255,0.55)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">
+        Website ansehen
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+      </a>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="status" class="text-xs transition-all" style="color:rgba(255,255,255,0.25)"></span>
+      <button id="pub-btn" onclick="publish()"
+        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white transition-all"
+        style="background:#4a7c59"
+        onmouseover="this.style.background='#3d6b4a'" onmouseout="this.style.background='#4a7c59'">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"/>
+        </svg>
+        Veröffentlichen
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <div class="flex flex-col overflow-y-auto flex-shrink-0 border-r"
+         style="width:196px;background:#191c1a;border-color:rgba(255,255,255,0.06)">
+      <div class="p-3 pt-5">
+        <p class="text-[10px] font-bold uppercase tracking-[0.15em] px-3 mb-2" style="color:rgba(255,255,255,0.2)">Bereiche</p>
+        <nav id="nav" class="space-y-0.5"></nav>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto" style="background:#141716">
+      <div class="max-w-2xl mx-auto px-8 py-10" id="content"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SCRIPT ═══════════════════════════ -->
+<script>
+// ── Config ───────────────────────────────────────────────────────────────
+const PW       = 'Stitch2026';      // Change this line to update the password
+const REPO     = 'johannemraa/stitch';
+const HTMLFILE = 'index.html';
+const IMGFILE  = 'background_image.png';
+
+// ── State ────────────────────────────────────────────────────────────────
+let rawHtml      = '';
+let ghToken      = '';
+let activeId     = 'hero';
+let fieldCache   = {};   // key → current edited value (survives section switches)
+let pendingImage = null;
+
+// ── Section definitions ───────────────────────────────────────────────────
+const SECTIONS = [
+  {
+    id: 'hero', label: 'Hero-Bereich',
+    fields: [
+      { key: 'hero-eyebrow',  label: 'Eyebrow-Text',                hint: 'Kleine Zeile über der Hauptüberschrift', type: 'text'     },
+      { key: 'hero-h1-1',    label: 'Überschrift — Zeile 1',                                                        type: 'text'     },
+      { key: 'hero-display', label: 'Überschrift — Highlight (kursiv)',                                              type: 'text'     },
+      { key: 'hero-h1-2',    label: 'Überschrift — Zeile 3',                                                        type: 'text'     },
+      { key: 'hero-sub',     label: 'Untertitel',                                                                    type: 'textarea' },
+      { key: '__img',        label: 'Hintergrundbild',                                                               type: 'image'    },
+    ]
+  },
+  {
+    id: 'services', label: 'Leistungen',
+    fields: [
+      { key: 'svc-01-title', label: 'Leistung 01 — Titel',        type: 'text'     },
+      { key: 'svc-01-desc',  label: 'Leistung 01 — Beschreibung', type: 'textarea' },
+      { key: 'svc-02-title', label: 'Leistung 02 — Titel',        type: 'text'     },
+      { key: 'svc-02-desc',  label: 'Leistung 02 — Beschreibung', type: 'textarea' },
+      { key: 'svc-03-title', label: 'Leistung 03 — Titel',        type: 'text'     },
+      { key: 'svc-03-desc',  label: 'Leistung 03 — Beschreibung', type: 'textarea' },
+      { key: 'svc-04-title', label: 'Leistung 04 — Titel',        type: 'text'     },
+      { key: 'svc-04-desc',  label: 'Leistung 04 — Beschreibung', type: 'textarea' },
+      { key: 'svc-05-title', label: 'Leistung 05 — Titel',        type: 'text'     },
+      { key: 'svc-05-desc',  label: 'Leistung 05 — Beschreibung', type: 'textarea' },
+      { key: 'svc-06-title', label: 'Leistung 06 — Titel',        type: 'text'     },
+      { key: 'svc-06-desc',  label: 'Leistung 06 — Beschreibung', type: 'textarea' },
+    ]
+  },
+  {
+    id: 'einsatz', label: 'Einsatzgebiet',
+    fields: [
+      { key: 'einsatz-sub', label: 'Untertitel', type: 'textarea' },
+    ]
+  },
+];
+
+// ── Auth ─────────────────────────────────────────────────────────────────
+function unlock() {
+  if (document.getElementById('pw-input').value === PW) {
+    document.getElementById('gate').remove();
+    const saved = sessionStorage.getItem('fs_tok');
+    if (saved) { ghToken = saved; initApp(); }
+    else { document.getElementById('token-gate').classList.remove('hidden'); }
+  } else {
+    const e = document.getElementById('pw-err');
+    e.classList.remove('hidden');
+    setTimeout(() => e.classList.add('hidden'), 2500);
+  }
+}
+
+function saveToken() {
+  const v = document.getElementById('token-input').value.trim();
+  if (!v) { document.getElementById('token-err').classList.remove('hidden'); return; }
+  ghToken = v;
+  sessionStorage.setItem('fs_tok', ghToken);
+  document.getElementById('token-gate').classList.add('hidden');
+  initApp();
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+async function initApp() {
+  document.getElementById('app').classList.remove('hidden');
+  setStatus('Lade Inhalt…');
+  try {
+    const data = await ghGet(HTMLFILE);
+    rawHtml = decode64(data.content);
+    renderNav();
+    showSection('hero');
+    setStatus('');
+  } catch(e) {
+    setStatus('Ladefehler — Token prüfen');
+  }
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────
+const NAV_ICONS = {
+  hero:     '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>',
+  services: '<path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/>',
+  einsatz:  '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>',
+};
+
+function renderNav() {
+  document.getElementById('nav').innerHTML = SECTIONS.map(s => `
+    <button onclick="showSection('${s.id}')" id="nav-${s.id}"
+      class="w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 transition-all"
+      style="color:rgba(255,255,255,0.4)">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        ${NAV_ICONS[s.id] || ''}
+      </svg>
+      <span>${s.label}</span>
+    </button>
+  `).join('');
+  setNavActive('hero');
+}
+
+function setNavActive(id) {
+  SECTIONS.forEach(s => {
+    const btn = document.getElementById(`nav-${s.id}`);
+    if (!btn) return;
+    if (s.id === id) {
+      btn.style.background = 'rgba(74,124,89,0.14)';
+      btn.style.color = '#8ecf9e';
+    } else {
+      btn.style.background = '';
+      btn.style.color = 'rgba(255,255,255,0.4)';
+      btn.onmouseover = () => { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.color = 'rgba(255,255,255,0.75)'; };
+      btn.onmouseout  = () => { btn.style.background = ''; btn.style.color = 'rgba(255,255,255,0.4)'; };
+    }
+  });
+}
+
+// ── Section rendering ─────────────────────────────────────────────────────
+function showSection(id) {
+  flushDomToCache();
+  activeId = id;
+  setNavActive(id);
+  const s = SECTIONS.find(s => s.id === id);
+  const area = document.getElementById('content');
+  area.innerHTML = `
+    <div class="pb-6 mb-8 border-b" style="border-color:rgba(255,255,255,0.06)">
+      <h2 class="font-headline text-2xl font-bold text-white">${s.label}</h2>
+      <p class="text-sm mt-1" style="color:rgba(255,255,255,0.28)">Änderungen werden nach „Veröffentlichen" live geschaltet.</p>
+    </div>
+    <div class="space-y-5">${s.fields.map(buildField).join('')}</div>
+  `;
+  const imgIn = document.getElementById('img-input');
+  if (imgIn) imgIn.addEventListener('change', onImagePick);
+}
+
+function buildField(f) {
+  if (f.type === 'image') {
+    return `
+      <div class="rounded-xl border p-5" style="background:#1c1f1d;border-color:rgba(255,255,255,0.07)">
+        <p class="text-[11px] font-bold uppercase tracking-[0.13em] mb-3" style="color:rgba(255,255,255,0.28)">${f.label}</p>
+        <img id="img-preview" src="background_image.png" alt=""
+          class="w-full rounded-lg mb-4 object-cover" style="height:140px;opacity:0.7"
+          onerror="this.style.display='none'"/>
+        <label class="inline-flex items-center gap-2 cursor-pointer rounded-lg px-4 py-2.5 text-sm transition-all"
+               style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.65)"
+               onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          Bild wählen
+          <input type="file" id="img-input" accept="image/*" class="hidden"/>
+        </label>
+        <span id="img-name" class="text-xs ml-2" style="color:rgba(255,255,255,0.25)"></span>
+      </div>`;
+  }
+
+  const id  = `f-${f.key}`;
+  const val = escHtml(getVal(f.key));
+  const inputStyle = `background:#1c1f1d;border-color:rgba(255,255,255,0.08);color:#ddd9d1`;
+  const focusHandlers = `onfocus="this.style.borderColor='rgba(74,124,89,0.45)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'"`;
+
+  return `
+    <div>
+      <label for="${id}" class="block text-[11px] font-bold uppercase tracking-[0.13em] mb-2" style="color:rgba(255,255,255,0.28)">${f.label}</label>
+      ${f.hint ? `<p class="text-xs mb-2" style="color:rgba(255,255,255,0.2)">${f.hint}</p>` : ''}
+      ${f.type === 'textarea'
+        ? `<textarea id="${id}" rows="3" class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors resize-y leading-relaxed" style="${inputStyle}" ${focusHandlers}>${val}</textarea>`
+        : `<input type="text" id="${id}" value="${val}" class="w-full rounded-xl px-4 py-3 text-sm border focus:outline-none transition-colors" style="${inputStyle}" ${focusHandlers}/>`
+      }
+    </div>`;
+}
+
+// ── Field cache ───────────────────────────────────────────────────────────
+function flushDomToCache() {
+  SECTIONS.forEach(s => s.fields.forEach(f => {
+    if (f.type === 'image') return;
+    const el = document.getElementById(`f-${f.key}`);
+    if (el) fieldCache[f.key] = el.value;
+  }));
+}
+
+function getVal(key) {
+  if (fieldCache[key] !== undefined) return fieldCache[key];
+  return decodeEnts(extract(rawHtml, key));
+}
+
+// ── Image pick ────────────────────────────────────────────────────────────
+function onImagePick(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  pendingImage = file;
+  document.getElementById('img-name').textContent = file.name;
+  const r = new FileReader();
+  r.onload = ev => {
+    const p = document.getElementById('img-preview');
+    if (p) { p.src = ev.target.result; p.style.display = 'block'; }
+  };
+  r.readAsDataURL(file);
+}
+
+// ── Publish ───────────────────────────────────────────────────────────────
+async function publish() {
+  flushDomToCache();
+  const btn = document.getElementById('pub-btn');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  try {
+    let html = rawHtml;
+    SECTIONS.forEach(s => s.fields.forEach(f => {
+      if (f.type === 'image') return;
+      const val = fieldCache[f.key] !== undefined ? fieldCache[f.key] : decodeEnts(extract(rawHtml, f.key));
+      html = update(html, f.key, encodeEnts(val));
+    }));
+
+    if (pendingImage) {
+      setStatus('Bild wird hochgeladen…');
+      await uploadImage(pendingImage);
+    }
+
+    setStatus('Wird gespeichert…');
+    await commitFile(HTMLFILE, html, 'Inhalt aktualisiert via FS Editor');
+    rawHtml = html;
+    pendingImage = null;
+    const n = document.getElementById('img-name');
+    if (n) n.textContent = '';
+    setStatus('✓ Veröffentlicht — Vercel deployt in ~30 Sek.');
+    setTimeout(() => setStatus(''), 8000);
+  } catch(e) {
+    setStatus('Fehler: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.style.opacity = '';
+}
+
+// ── GitHub helpers ────────────────────────────────────────────────────────
+async function ghGet(path) {
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+  return r.json();
+}
+
+async function commitFile(path, content, message) {
+  const file    = await ghGet(path);
+  const encoded = encode64(content);
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, content: encoded, sha: file.sha })
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Commit fehlgeschlagen'); }
+}
+
+async function uploadImage(file) {
+  const b64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  let sha;
+  try { const f = await ghGet(IMGFILE); sha = f.sha; } catch {}
+  const body = { message: 'Hintergrundbild aktualisiert', content: b64 };
+  if (sha) body.sha = sha;
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${IMGFILE}`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error('Bild-Upload fehlgeschlagen');
+}
+
+// ── Content helpers ───────────────────────────────────────────────────────
+function extract(html, key) {
+  const m = html.match(new RegExp(`<!-- EDIT:${key} -->([\\s\\S]*?)<!-- /EDIT:${key} -->`));
+  return m ? m[1].trim() : '';
+}
+
+function update(html, key, value) {
+  return html.replace(
+    new RegExp(`<!-- EDIT:${key} -->[\\s\\S]*?<!-- /EDIT:${key} -->`),
+    `<!-- EDIT:${key} -->${value}<!-- /EDIT:${key} -->`
+  );
+}
+
+function decodeEnts(s) {
+  const d = document.createElement('div'); d.innerHTML = s; return d.textContent || '';
+}
+function encodeEnts(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function encode64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function decode64(b64) {
+  const bin  = atob(b64.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('gate') && document.activeElement?.id === 'pw-input')    { unlock();    }
+    if (!document.getElementById('token-gate')?.classList.contains('hidden') && document.activeElement?.id === 'token-input') { saveToken(); }
+  }
+});
+</script>
+</body>
+</html>

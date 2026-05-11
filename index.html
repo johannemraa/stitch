@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="utf-8"/>
@@ -446,23 +446,23 @@ tailwind.config = {
     <div>
       <div class="flex items-center gap-3 mb-7 js-up" id="h-eyebrow">
         <div class="w-8 h-px bg-primary"></div>
-        <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">München &amp; Region · Professioneller Hausmeisterservice</span>
+        <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label"><!-- EDIT:hero-eyebrow -->München &amp; Region · Professioneller Hausmeisterservice<!-- /EDIT:hero-eyebrow --></span>
       </div>
 
       <div class="js-up mb-7" id="h-headline">
         <h1 class="font-headline text-[3.2rem] md:text-[4.2rem] lg:text-[5rem] font-bold text-on-surface leading-[1.05] tracking-tight">
-          Genießen Sie
+          <!-- EDIT:hero-h1-1 -->Genießen Sie<!-- /EDIT:hero-h1-1 -->
         </h1>
         <div class="hero-display text-[4.5rem] md:text-[6rem] lg:text-[7.5rem]">
-          Ihre Freizeit.
+          <!-- EDIT:hero-display -->Ihre Freizeit.<!-- /EDIT:hero-display -->
         </div>
         <h1 class="font-headline text-[3.2rem] md:text-[4.2rem] lg:text-[5rem] font-bold text-on-surface leading-[1.05] tracking-tight">
-          Auf uns ist Verlass.
+          <!-- EDIT:hero-h1-2 -->Auf uns ist Verlass.<!-- /EDIT:hero-h1-2 -->
         </h1>
       </div>
 
       <p class="font-body text-lg text-on-surface-variant max-w-md leading-relaxed mb-10 js-up" id="h-sub">
-        FS-Hausmeisterservice kümmert sich zuverlässig um alles rund um Ihre Immobilie — von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.
+        <!-- EDIT:hero-sub -->FS-Hausmeisterservice kümmert sich zuverlässig um alles rund um Ihre Immobilie — von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:hero-sub -->
       </p>
 
       <div class="flex flex-wrap items-center gap-4 mb-14 js-up" id="h-cta">
@@ -531,12 +531,12 @@ tailwind.config = {
           <div class="relative">
             <select id="qf-service" name="service" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface appearance-none transition-all">
               <option value="">Leistung wählen …</option>
-              <option>Garten- &amp; Landschaftspflege</option>
-              <option>Gebäude- &amp; Treppenhausreinigung</option>
+              <option><!-- EDIT:svc-01-title -->Garten- &amp; Landschaftspflege<!-- /EDIT:svc-01-title --></option>
+              <option><!-- EDIT:svc-02-title -->Gebäude- &amp; Treppenhausreinigung<!-- /EDIT:svc-02-title --></option>
               <option>Fensterreinigung</option>
               <option>Winterdienst / Schneeräumung</option>
               <option>Dachrinnenreinigung</option>
-              <option>Montagearbeiten &amp; Entrümpelung</option>
+              <option><!-- EDIT:svc-05-title -->Montagearbeiten &amp; Entrümpelung<!-- /EDIT:svc-05-title --></option>
               <option>Sonstiges / Mehrere Leistungen</option>
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">expand_more</span>
@@ -576,7 +576,7 @@ tailwind.config = {
   <div class="marquee-track">
     <div class="flex items-center gap-14 pr-14 flex-shrink-0">
       <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
-        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span>Garten- &amp; Landschaftspflege
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span><!-- EDIT:svc-01-title -->Garten- &amp; Landschaftspflege<!-- /EDIT:svc-01-title -->
       </span>
       <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
         <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">cleaning_services</span>Gebäudereinigung
@@ -593,7 +593,7 @@ tailwind.config = {
     </div>
     <div class="flex items-center gap-14 pr-14 flex-shrink-0">
       <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
-        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span>Garten- &amp; Landschaftspflege
+        <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">yard</span><!-- EDIT:svc-01-title -->Garten- &amp; Landschaftspflege<!-- /EDIT:svc-01-title -->
       </span>
       <span class="flex items-center gap-2.5 text-on-primary/70 text-[11px] font-bold tracking-[0.2em] uppercase font-label whitespace-nowrap">
         <span class="material-symbols-outlined text-on-primary/50 text-base" style="font-variation-settings:'FILL' 1">cleaning_services</span>Gebäudereinigung
@@ -638,8 +638,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">yard</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 01</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Garten- &amp; Landschaftspflege</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Rasenmähen, Heckenschnitt, Unkrautentfernung und Gartenrevitalisierung — damit Ihr Außenbereich das ganze Jahr gepflegt aussieht.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-01-title -->Garten- &amp; Landschaftspflege<!-- /EDIT:svc-01-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-01-desc -->Rasenmähen, Heckenschnitt, Unkrautentfernung und Gartenrevitalisierung — damit Ihr Außenbereich das ganze Jahr gepflegt aussieht.<!-- /EDIT:svc-01-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -651,8 +651,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">cleaning_services</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 02</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Gebäude- &amp; Treppenhausreinigung</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Büroreinigung, Treppenhausreinigung, Grundreinigung, Fenster- und Dachrinnenreinigung — makellose Ergebnisse, auf die Sie sich verlassen können.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-02-title -->Gebäude- &amp; Treppenhausreinigung<!-- /EDIT:svc-02-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-02-desc -->Büroreinigung, Treppenhausreinigung, Grundreinigung, Fenster- und Dachrinnenreinigung — makellose Ergebnisse, auf die Sie sich verlassen können.<!-- /EDIT:svc-02-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -664,8 +664,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">ac_unit</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 03</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Winterdienst</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Zuverlässige Schneeräumung und Streuung für Einfahrten, Gehwege und Eingänge — damit Ihre Immobilie auch im Winter sicher bleibt.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-03-title -->Winterdienst<!-- /EDIT:svc-03-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-03-desc -->Zuverlässige Schneeräumung und Streuung für Einfahrten, Gehwege und Eingänge — damit Ihre Immobilie auch im Winter sicher bleibt.<!-- /EDIT:svc-03-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -677,8 +677,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">water_drop</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 04</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Fenster- &amp; Dachrinnenreinigung</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Kristallklare Scheiben und freie Abflüsse — professionell und termingerecht erledigt, ohne Rückstände.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-04-title -->Fenster- &amp; Dachrinnenreinigung<!-- /EDIT:svc-04-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-04-desc -->Kristallklare Scheiben und freie Abflüsse — professionell und termingerecht erledigt, ohne Rückstände.<!-- /EDIT:svc-04-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -690,8 +690,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">home_repair_service</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 05</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Montagearbeiten &amp; Entrümpelung</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Aufbau, Abbau und Räumung nach Bedarf — schnell, sauber und von erfahrenen Fachkräften durchgeführt.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-05-title -->Montagearbeiten &amp; Entrümpelung<!-- /EDIT:svc-05-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-05-desc -->Aufbau, Abbau und Räumung nach Bedarf — schnell, sauber und von erfahrenen Fachkräften durchgeführt.<!-- /EDIT:svc-05-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -703,8 +703,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">handyman</span>
         </div>
         <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-outline mb-2 font-label">Leistung 06</div>
-        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">Hausmeisterdienste</h3>
-        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1">Kleinere Reparaturen, Inspektionen und laufende Objektbetreuung — zuverlässige Betreuung Ihrer Immobilie rund ums Jahr.</p>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-primary transition-colors"><!-- EDIT:svc-06-title -->Hausmeisterdienste<!-- /EDIT:svc-06-title --></h3>
+        <p class="font-body text-on-surface-variant text-sm leading-relaxed flex-1"><!-- EDIT:svc-06-desc -->Kleinere Reparaturen, Inspektionen und laufende Objektbetreuung — zuverlässige Betreuung Ihrer Immobilie rund ums Jahr.<!-- /EDIT:svc-06-desc --></p>
         <div class="flex items-center gap-2 text-primary text-[11px] font-bold tracking-widest uppercase font-label group-hover:gap-4 transition-all mt-5">
           Mehr erfahren <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </div>
@@ -781,7 +781,7 @@ tailwind.config = {
         <span class="accent-line js-line"></span>
       </div>
       <p class="font-body text-lg text-on-surface-variant max-w-sm md:text-right leading-relaxed js-up">
-        Starnberg und die gesamte Region am See — von Gauting bis Weilheim, von Herrsching bis Tutzing. Klicken Sie auf einen Ort für mehr Infos.
+        <!-- EDIT:einsatz-sub -->Starnberg und die gesamte Region am See — von Gauting bis Weilheim, von Herrsching bis Tutzing. Klicken Sie auf einen Ort für mehr Infos.<!-- /EDIT:einsatz-sub -->
       </p>
     </div>
 
@@ -1006,11 +1006,11 @@ tailwind.config = {
       <div>
         <h5 class="font-label text-[11px] font-bold text-inverse-on-surface/50 mb-5 uppercase tracking-[0.2em]">Leistungen</h5>
         <ul class="space-y-3">
-          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Garten- &amp; Landschaftspflege</a></li>
-          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Gebäude- &amp; Treppenhausreinigung</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm"><!-- EDIT:svc-01-title -->Garten- &amp; Landschaftspflege<!-- /EDIT:svc-01-title --></a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm"><!-- EDIT:svc-02-title -->Gebäude- &amp; Treppenhausreinigung<!-- /EDIT:svc-02-title --></a></li>
           <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Winterdienst</a></li>
-          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Fenster- &amp; Dachrinnenreinigung</a></li>
-          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm">Montagearbeiten &amp; Entrümpelung</a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm"><!-- EDIT:svc-04-title -->Fenster- &amp; Dachrinnenreinigung<!-- /EDIT:svc-04-title --></a></li>
+          <li><a href="#leistungen" class="font-body text-inverse-on-surface/45 hover:text-primary transition-colors text-sm"><!-- EDIT:svc-05-title -->Montagearbeiten &amp; Entrümpelung<!-- /EDIT:svc-05-title --></a></li>
         </ul>
       </div>
 
