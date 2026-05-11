@@ -123,7 +123,7 @@
     <p class="gate-sub">Zugangscode eingeben</p>
     <div class="gate-card">
       <input class="gate-input" type="password" id="pw-in" placeholder="Passwort" autocomplete="off"/>
-      <button class="gate-btn" onclick="unlock()">Anmelden</button>
+      <button class="gate-btn" id="pw-btn">Anmelden</button>
       <p class="gate-err" id="pw-err"></p>
     </div>
   </div>
@@ -142,7 +142,7 @@
         3. Token kopieren und unten einfügen
       </div>
       <input class="gate-input" type="password" id="tok-in" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-family:monospace;color:#8ecf9e"/>
-      <button class="gate-btn" onclick="saveToken()">Verbinden &amp; weiter</button>
+      <button class="gate-btn" id="tok-btn">Verbinden &amp; weiter</button>
       <p class="gate-err" id="tok-err"></p>
     </div>
   </div>
@@ -248,7 +248,7 @@ function prepareHtml(html) {
   html = html.replace(/<script[^>]*gsap[^>]*><\/script>/gi, '');
   // Remove the main inline <script> block (last one in <body>)
   const lastOpen  = html.lastIndexOf('<script>');
-  const lastClose = html.lastIndexOf('</script>');
+  const lastClose = html.lastIndexOf('<\/script>');
   if (lastOpen !== -1 && lastClose > lastOpen) {
     html = html.slice(0, lastOpen) + html.slice(lastClose + 9);
   }
@@ -494,13 +494,13 @@ function setStatus(msg, type = '') {
   el.className = type;
 }
 
+// ─── Button wiring ────────────────────────────────────────────────────────
+document.getElementById('pw-btn').addEventListener('click', unlock);
+document.getElementById('tok-btn').addEventListener('click', saveToken);
+
 // ─── Keyboard shortcuts ───────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if (!document.getElementById('gate-pw').classList.contains('hidden') && document.activeElement?.id === 'pw-in')  { unlock();    }
-    if (!document.getElementById('gate-tok').classList.contains('hidden') && document.activeElement?.id === 'tok-in') { saveToken(); }
-  }
-});
+document.getElementById('pw-in').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+document.getElementById('tok-in').addEventListener('keydown', e => { if (e.key === 'Enter') saveToken(); });
 </script>
 </body>
 </html>
