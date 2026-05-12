@@ -246,6 +246,9 @@ function showErr(id, msg) {
   setTimeout(() => el.textContent = '', 3000);
 }
 
+// Tailwind config — mirrors index.html exactly so canvas colours match the live site
+const TW_CONFIG = {theme:{extend:{colors:{"primary":"#4a7c59","on-primary":"#ffffff","primary-fixed":"#c8e8d0","primary-fixed-dim":"#8ecf9e","on-primary-fixed":"#002110","on-primary-fixed-variant":"#2a6038","secondary":"#6b6358","on-secondary":"#ffffff","secondary-fixed":"#f0e8db","secondary-fixed-dim":"#d4ccbf","on-secondary-fixed":"#1e1a13","tertiary":"#705c30","on-tertiary":"#ffffff","tertiary-container":"#c4a66a","tertiary-fixed":"#f8e0a8","surface":"#faf6f0","surface-dim":"#dbd7cf","surface-container-lowest":"#ffffff","surface-container-low":"#f5f1ea","surface-container":"#f0ece4","surface-container-high":"#eae6de","surface-container-highest":"#e4e0d8","surface-variant":"#e4e0d8","on-surface":"#2e3230","on-surface-variant":"#4a4e4a","outline":"#74796e","outline-variant":"#c4c8bc","background":"#faf6f0","on-background":"#2e3230","inverse-surface":"#2e3230","inverse-on-surface":"#f5f0e8","inverse-primary":"#8ecf9e"},fontFamily:{"headline":["Literata","Georgia","serif"],"display":["Cormorant Garamond","Georgia","serif"],"body":["Nunito Sans","sans-serif"],"label":["Nunito Sans","sans-serif"]}}}};
+
 // ── Init ───────────────────────────────────────────────────────
 async function initApp() {
   document.getElementById('app').classList.add('visible');
@@ -253,7 +256,6 @@ async function initApp() {
   try {
     const file = await ghGet(HTMLFILE);
     setupEditor(decode64(file.content));
-    setStatus('');
   } catch(e) {
     setStatus('Ladefehler — Token prüfen', 'err');
   }
@@ -264,50 +266,15 @@ function setupEditor(html) {
   const parser = new DOMParser();
   const doc    = parser.parseFromString(html, 'text/html');
 
-  // Preserve <script> tags in body — GrapesJS strips them
+  // Preserve body <script> tags — GrapesJS strips them on parse
   const bodyScripts = Array.from(doc.body.querySelectorAll('script'));
   storedScripts = bodyScripts.map(s => s.outerHTML).join('\n');
   bodyScripts.forEach(s => s.remove());
   const bodyHtml = doc.body.innerHTML;
 
-  // Build a minimal canvas head — Tailwind + fonts only.
-  // GSAP, Leaflet & ScrollTrigger are intentionally excluded: they throw
-  // errors in the canvas iframe and prevent components from rendering.
-  const SC = '<' + '/script>';  // safe closing tag — avoids ending this script block
-
-  // All <link> tags except Leaflet CSS
-  const linkTags = Array.from(doc.head.querySelectorAll('link'))
-    .filter(l => !l.href.includes('leaflet'))
-    .map(l => l.outerHTML)
-    .join('\n');
-
-  // Tailwind config inline script (must come BEFORE the CDN so config is ready)
-  let twConfigHtml = '';
-  Array.from(doc.head.querySelectorAll('script:not([src])')).forEach(s => {
-    if (s.textContent.includes('tailwind.config')) {
-      twConfigHtml = '<script>' + s.textContent.trim() + SC;
-    }
-  });
-
-  // Tailwind CDN script only (skip GSAP, Leaflet, ScrollTrigger)
-  const cdnScripts = Array.from(doc.head.querySelectorAll('script[src]'))
-    .filter(s => s.src.includes('tailwindcss'))
-    .map(s => '<script src="' + s.src + '">' + SC)
-    .join('\n');
-
-  // Custom inline <style> blocks (body font, colours)
-  const styleBlocks = Array.from(doc.head.querySelectorAll('style'))
-    .map(s => '<style>' + s.textContent + '</style>')
-    .join('\n');
-
-  const frameContent = '<!DOCTYPE html><html lang="de"><head>\n' +
-    '<meta charset="utf-8"/>\n' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n' +
-    linkTags + '\n' +
-    twConfigHtml + '\n' +
-    cdnScripts + '\n' +
-    styleBlocks + '\n' +
-    '<' + '/head><body><' + '/body><' + '/html>';
+  // Extract inline <style> text for protectedCss
+  const inlineCss = Array.from(doc.head.querySelectorAll('style'))
+    .map(s => s.textContent).join('\n');
 
   gjsEditor = grapesjs.init({
     container: '#gjs',
@@ -318,7 +285,22 @@ function setupEditor(html) {
 
     components: bodyHtml,
 
-    canvas: { frameContent },
+    // canvas.styles / canvas.scripts inject <link> and <script> elements into
+    // the canvas iframe head — this is the documented, reliable approach.
+    // NOTE: frameContent is intentionally NOT used — it injects into the body,
+    // not the full frame, breaking the HTML structure entirely.
+    canvas: {
+      styles: [
+        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,300..700;1,6..12,300..400&display=swap',
+        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap',
+      ],
+      scripts: [
+        'https://cdn.tailwindcss.com?plugins=forms',
+      ],
+    },
+
+    // protectedCss is added as a <style> block inside the canvas iframe
+    protectedCss: inlineCss,
 
     plugins: ['gjs-preset-webpage'],
     pluginsOpts: {
@@ -330,6 +312,24 @@ function setupEditor(html) {
         modalImportButton: 'Importieren',
       }
     },
+  });
+
+  // After the canvas frame is ready, inject the Tailwind config.
+  // We poll because canvas.scripts load asynchronously after the load event.
+  gjsEditor.on('load', () => setStatus(''));
+  gjsEditor.on('load', () => {
+    const inject = (tries) => {
+      if (tries <= 0) return;
+      try {
+        const win = gjsEditor.Canvas.getWindow();
+        if (win && win.tailwind) {
+          win.tailwind.config = TW_CONFIG;
+          return;
+        }
+      } catch(e) {}
+      setTimeout(() => inject(tries - 1), 300);
+    };
+    inject(30); // poll for up to 9 seconds
   });
 }
 
