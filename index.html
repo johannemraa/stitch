@@ -292,10 +292,11 @@ tailwind.config = {
   }
   .ec-collapsed {
     position: absolute; inset: 0; padding: 20px;
-    display: flex; flex-direction: column; justify-content: space-between;
+    display: flex; flex-direction: column;
     transition: opacity 0.25s ease;
   }
   .ec-card.ec-expanded .ec-collapsed { opacity: 0; pointer-events: none; }
+  #ec-map-card:not(.ec-expanded):hover .ec-collapsed { opacity: 0.88; }
 
   .ec-detail {
     position: absolute; inset: 0; padding: 20px;
@@ -864,11 +865,22 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
                 <span style="width:6px;height:6px;background:#8ecf9e;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite"></span>
                 Aktives Einsatzgebiet
               </span>
-              <span style="font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.3);font-weight:600;letter-spacing:0.05em">Karte wird geladen …</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </div>
+            <!-- decorative pin centred in the card -->
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px 0">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.18">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#8ecf9e"/>
+                <circle cx="12" cy="9" r="2.5" fill="#2e3230"/>
+              </svg>
             </div>
             <div>
               <div class="ec-name" style="font-size:1.55rem">Starnberg &amp; Region</div>
               <div class="ec-coords" style="margin-top:5px">10 Einsatzgebiete · Starnberger See · Ammersee · Weilheim</div>
+              <div style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:700;color:rgba(245,240,232,0.4);letter-spacing:0.1em;text-transform:uppercase">
+                Karte öffnen
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </div>
             </div>
           </div>
 
@@ -879,7 +891,10 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
                 <span style="width:6px;height:6px;background:#8ecf9e;border-radius:50%;flex-shrink:0"></span>
                 Aktives Einsatzgebiet
               </span>
-              <span style="font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.35);font-weight:600">10 Standorte · Klicken zum Schließen</span>
+              <button onclick="ecCollapseMap()" style="display:flex;align-items:center;gap:5px;font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.4);font-weight:600;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s" onmouseover="this.style.color='rgba(245,240,232,0.75)'" onmouseout="this.style.color='rgba(245,240,232,0.4)'">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                Schließen
+              </button>
             </div>
             <div id="ec-leaflet-map"></div>
           </div>
@@ -1300,17 +1315,21 @@ ecMapCard.addEventListener('mouseleave', () => {
   if (!ecMapCard.classList.contains('ec-expanded')) ecMapCard.style.transform = '';
 });
 
-// Auto-expand when section scrolls into view
-const ecObserver = new IntersectionObserver(entries => {
-  if (entries[0].isIntersecting && !ecMapInited) {
+// Expand on click (collapsed state only)
+ecMapCard.addEventListener('click', e => {
+  if (ecMapCard.classList.contains('ec-expanded')) return;
+  ecMapCard.style.transform = '';
+  ecMapCard.classList.add('ec-expanded');
+  if (!ecMapInited) {
     ecMapInited = true;
-    ecMapCard.style.transform = '';
-    ecMapCard.classList.add('ec-expanded');
-    setTimeout(initEcLeaflet, 500);
-    ecObserver.disconnect();
+    setTimeout(initEcLeaflet, 400);
   }
-}, { threshold: 0.25 });
-ecObserver.observe(document.getElementById('einsatzgebiet'));
+});
+
+// Close button handler
+window.ecCollapseMap = function() {
+  ecMapCard.classList.remove('ec-expanded');
+};
 
 function initEcLeaflet() {
   const mapEl = document.getElementById('ec-leaflet-map');
