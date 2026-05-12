@@ -846,7 +846,7 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
       </div>
 
       <!-- ── Right: expand map card (square when open) ── -->
-      <div class="md:w-[45%] w-full js-right flex flex-col h-full">
+      <div class="md:w-[45%] w-full js-right flex flex-col">
         <div id="ec-map-card" class="ec-card">
           <!-- Grid pattern background -->
           <svg class="ec-pattern" xmlns="http://www.w3.org/2000/svg">
@@ -891,7 +891,7 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
                 <span style="width:6px;height:6px;background:#8ecf9e;border-radius:50%;flex-shrink:0"></span>
                 Aktives Einsatzgebiet
               </span>
-              <button onclick="ecCollapseMap()" style="display:flex;align-items:center;gap:5px;font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.4);font-weight:600;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s" onmouseover="this.style.color='rgba(245,240,232,0.75)'" onmouseout="this.style.color='rgba(245,240,232,0.4)'">
+              <button onclick="ecCollapseMap(); event.stopPropagation()" style="display:flex;align-items:center;gap:5px;font-family:'Nunito Sans',sans-serif;font-size:11px;color:rgba(245,240,232,0.4);font-weight:600;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s" onmouseover="this.style.color='rgba(245,240,232,0.75)'" onmouseout="this.style.color='rgba(245,240,232,0.4)'">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 Schließen
               </button>
