@@ -780,53 +780,51 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ── Google Reviews ──
-const GKEY     = 'AIzaSyB_WHDNhwEO_DxDghd2vtjDjo_koQZMgi0';
-const GR_CACHE = 'fs_gr_v2';
-const GR_TTL   = 24 * 60 * 60 * 1000; // refresh once a day
+const GKEY      = 'AIzaSyB_WHDNhwEO_DxDghd2vtjDjo_koQZMgi0';
+const GPLACE_ID = 'ChIJZcITeCnQnUcRw9E9o_rCT0w';
+const GR_CACHE  = 'fs_gr_v2';
+const GR_TTL    = 24 * 60 * 60 * 1000;
 
 let currentT = 0;
 let tAutoTimer = null;
 let activeReviews = [];
 
+function deRelTime(s) {
+  if (!s) return '';
+  return s
+    .replace(/^a year ago$/,        'vor einem Jahr')
+    .replace(/^(\d+) years? ago$/,  (_, n) => `vor ${n} Jahren`)
+    .replace(/^a month ago$/,       'vor einem Monat')
+    .replace(/^(\d+) months? ago$/, (_, n) => `vor ${n} Monat${n > 1 ? 'en' : ''}`)
+    .replace(/^a week ago$/,        'vor einer Woche')
+    .replace(/^(\d+) weeks? ago$/,  (_, n) => `vor ${n} Woche${n > 1 ? 'n' : ''}`)
+    .replace(/^a day ago$/,         'vor einem Tag')
+    .replace(/^(\d+) days? ago$/,   (_, n) => `vor ${n} Tag${n > 1 ? 'en' : ''}`);
+}
+
 async function loadGoogleReviews() {
-  // Return cached data if still fresh
   try {
     const c = JSON.parse(localStorage.getItem(GR_CACHE) || 'null');
     if (c && (Date.now() - c.ts) < GR_TTL) return c.data;
   } catch {}
 
-  // Step 1: text search → get place resource name + overview stats
-  const sRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': GKEY,
-      'X-Goog-FieldMask': 'places.name,places.rating,places.userRatingCount',
-    },
-    body: JSON.stringify({ textQuery: 'FS-Hausmeisterservice Starnberg', languageCode: 'de' }),
-  });
-  const sData = await sRes.json();
-  const place = sData.places?.[0];
-  if (!place) throw new Error('Place not found');
-
-  // Step 2: place details → reviews with author photos
-  const dRes = await fetch(`https://places.googleapis.com/v1/${place.name}`, {
+  const res = await fetch(`https://places.googleapis.com/v1/places/${GPLACE_ID}`, {
     headers: {
       'X-Goog-Api-Key': GKEY,
       'X-Goog-FieldMask': 'rating,userRatingCount,reviews',
     },
   });
-  const detail = await dRes.json();
+  const detail = await res.json();
 
   const data = {
-    rating: detail.rating ?? place.rating ?? 5,
-    total:  detail.userRatingCount ?? place.userRatingCount ?? 0,
+    rating: detail.rating ?? 5,
+    total:  detail.userRatingCount ?? 0,
     reviews: (detail.reviews || []).map(r => ({
       name:  r.authorAttribution?.displayName || 'Anonym',
       photo: r.authorAttribution?.photoUri    || null,
       rating: r.rating,
-      text:  r.text?.text || '',
-      when:  r.relativePublishTimeDescription || '',
+      text:  (r.originalText?.text || r.text?.text || '').trim(),
+      when:  deRelTime(r.relativePublishTimeDescription || ''),
     })),
   };
 
