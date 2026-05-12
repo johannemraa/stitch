@@ -259,6 +259,20 @@ tailwind.config = {
     object-fit: cover; border-radius: 50%;
     transition: opacity 0.2s;
   }
+  .t-quote-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+  .t-card.t-expanded .t-quote-text { display: block; overflow: visible; }
+  .t-read-more {
+    display: none; margin-top: 8px;
+    font-family: 'Nunito Sans', sans-serif; font-size: 11px; font-weight: 700;
+    color: #4a7c59; background: none; border: none; cursor: pointer; padding: 0;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .t-read-more:hover { opacity: 0.7; }
   .t-stack-outer { position: relative; min-height: 380px; }
   @media (max-width: 767px) {
     .t-stack-outer { min-height: 400px; }
@@ -869,7 +883,8 @@ function buildTestimonials(reviews) {
       <div class="t-stars mb-5">${'★'.repeat(t.rating)}</div>
       <div class="relative flex-1 mb-1">
         <span class="t-quote-glyph" aria-hidden="true">"</span>
-        <p class="font-body text-lg text-on-surface leading-relaxed italic">${t.text || '–'}</p>
+        <p class="t-quote-text font-body text-lg text-on-surface leading-relaxed italic">${t.text || '–'}</p>
+        <button class="t-read-more" onclick="tToggleExpand(this)">Mehr lesen ↓</button>
       </div>
       <hr class="t-sep"/>
       <div class="flex items-center gap-4">
@@ -891,7 +906,31 @@ function buildTestimonials(reviews) {
     dot.addEventListener('click', () => switchT(i));
     dotsContainer.appendChild(dot);
   });
+
+  // Show "Mehr lesen" only on cards whose text is actually clamped
+  requestAnimationFrame(() => {
+    activeReviews.forEach((_, i) => {
+      const p   = document.querySelector('#t-card-' + i + ' .t-quote-text');
+      const btn = document.querySelector('#t-card-' + i + ' .t-read-more');
+      if (p && btn && p.scrollHeight > p.clientHeight + 2) btn.style.display = 'block';
+    });
+  });
 }
+
+// Expand / collapse a review card
+window.tToggleExpand = function(btn) {
+  const card  = btn.closest('.t-card');
+  const stack = document.getElementById('t-stack');
+  const expanded = card.classList.toggle('t-expanded');
+  btn.textContent = expanded ? '↑ Weniger' : 'Mehr lesen ↓';
+  if (expanded) {
+    requestAnimationFrame(() => {
+      stack.style.minHeight = (card.scrollHeight + 8) + 'px';
+    });
+  } else {
+    stack.style.minHeight = '';
+  }
+};
 
 function updateOverallRating(rating, total) {
   const rEl = document.querySelector('#bewertungen .font-display.text-5xl');
