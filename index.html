@@ -352,7 +352,7 @@ tailwind.config = {
 
   /* Single expand-map card */
   #ec-map-card { width: 100%; height: 100%; min-height: 300px; cursor: pointer; }
-  #ec-map-card.ec-expanded { height: 420px; transform: none !important; cursor: default; }
+  #ec-map-card.ec-expanded { height: 100%; min-height: 360px; transform: none !important; cursor: default; }
   #ec-map-card .ec-detail { padding: 0; overflow: hidden; border-radius: 16px; }
   #ec-leaflet-map { width: 100%; flex: 1; min-height: 0; }
 
@@ -792,7 +792,7 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
     </div>
 
     <!-- Two columns: cards + map -->
-    <div class="flex flex-col md:flex-row items-start gap-12 lg:gap-16">
+    <div class="flex flex-col md:flex-row md:items-stretch gap-12 lg:gap-16">
 
       <!-- ── Left: info cards ── -->
       <div class="md:w-[55%] flex flex-col gap-3">
@@ -845,7 +845,7 @@ Von der Gartenpflege und Gebäudereinigung bis hin zum Winterdienst.<!-- /EDIT:h
       </div>
 
       <!-- ── Right: expand map card (square when open) ── -->
-      <div class="md:w-[45%] w-full js-right flex flex-col">
+      <div class="md:w-[45%] w-full js-right flex flex-col h-full">
         <div id="ec-map-card" class="ec-card">
           <!-- Grid pattern background -->
           <svg class="ec-pattern" xmlns="http://www.w3.org/2000/svg">
