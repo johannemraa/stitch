@@ -7,111 +7,136 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400..700&family=Nunito+Sans:opsz,wght@6..12,300..700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css"/>
+
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Nunito Sans', sans-serif; background: #141716; color: #ddd9d1; height: 100dvh; overflow: hidden; }
-  .font-hl { font-family: 'Literata', Georgia, serif; }
-  input, button { font-family: 'Nunito Sans', sans-serif; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: 'Nunito Sans', sans-serif; background: #141716; color: #ddd9d1; overflow: hidden; }
 
-  /* Gates */
-  .gate {
-    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: #141716; z-index: 100;
-  }
-  .gate.hidden { display: none; }
-  .gate-box {
-    width: 100%; max-width: 360px; padding: 0 16px;
-  }
-  .gate-logo {
-    width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px; border: 1px solid rgba(74,124,89,.28); background: rgba(74,124,89,.1);
-  }
-  .gate-logo svg { width: 22px; height: 22px; color: #4a7c59; }
-  .gate-title { font-family: 'Literata', serif; font-size: 1.35rem; font-weight: 700; color: #fff; text-align: center; }
-  .gate-sub { font-size: 12px; color: rgba(255,255,255,.3); text-align: center; margin-top: 4px; }
-  .gate-card {
-    margin-top: 28px; background: #1c1f1d; border: 1px solid rgba(255,255,255,.07);
-    border-radius: 18px; padding: 24px;
-  }
-  .gate-input {
-    width: 100%; background: #242826; border: 1px solid rgba(255,255,255,.09); border-radius: 12px;
-    padding: 12px 16px; font-size: 13px; color: #ddd9d1; outline: none; transition: border-color .15s; margin-bottom: 10px;
-  }
-  .gate-input:focus { border-color: rgba(74,124,89,.5); }
-  .gate-input::placeholder { color: rgba(255,255,255,.22); }
-  .gate-btn {
-    width: 100%; background: #4a7c59; border: none; border-radius: 12px; padding: 12px;
-    font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: background .15s;
-  }
-  .gate-btn:hover { background: #3d6b4a; }
-  .gate-err { font-size: 11px; color: #f87171; text-align: center; margin-top: 8px; min-height: 16px; }
-  .gate-hint {
-    background: #242826; border: 1px solid rgba(255,255,255,.06); border-radius: 12px;
-    padding: 14px 16px; font-size: 11px; line-height: 1.7; color: rgba(255,255,255,.38); margin-bottom: 12px;
-  }
-  .gate-hint a { color: #8ecf9e; }
-  .gate-hint code { background: rgba(255,255,255,.1); border-radius: 4px; padding: 1px 5px; }
-  .gate-hint strong { color: rgba(255,255,255,.6); font-weight: 700; }
+/* ── Auth gates ───────────────────────────────────────────────── */
+.gate {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: #141716;
+}
+.gate.hidden { display: none; }
+.gate-box { width: 100%; max-width: 380px; padding: 0 20px; }
+.gate-logo {
+  width: 52px; height: 52px; border-radius: 16px; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(74,124,89,.12); border: 1px solid rgba(74,124,89,.3);
+}
+.gate-logo svg { width: 24px; height: 24px; color: #4a7c59; }
+.gate-title { font-family: 'Literata', serif; font-size: 1.4rem; font-weight: 700; color: #fff; text-align: center; }
+.gate-sub { font-size: 12px; color: rgba(255,255,255,.3); text-align: center; margin-top: 4px; }
+.gate-card {
+  margin-top: 28px; background: #1c1f1d;
+  border: 1px solid rgba(255,255,255,.07); border-radius: 20px; padding: 24px;
+}
+.gate-input {
+  width: 100%; background: #242826; border: 1px solid rgba(255,255,255,.09);
+  border-radius: 12px; padding: 12px 16px; font-size: 13px; color: #ddd9d1;
+  outline: none; transition: border-color .15s; margin-bottom: 10px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.gate-input:focus { border-color: rgba(74,124,89,.5); }
+.gate-input::placeholder { color: rgba(255,255,255,.22); }
+.gate-btn {
+  width: 100%; background: #4a7c59; border: none; border-radius: 12px;
+  padding: 12px; font-size: 13px; font-weight: 700; color: #fff;
+  cursor: pointer; transition: background .15s; font-family: 'Nunito Sans', sans-serif;
+}
+.gate-btn:hover { background: #3d6b4a; }
+.gate-err { font-size: 11px; color: #f87171; text-align: center; margin-top: 8px; min-height: 16px; }
+.gate-hint {
+  background: #242826; border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px; padding: 14px 16px; font-size: 11px; line-height: 1.8;
+  color: rgba(255,255,255,.38); margin-bottom: 12px;
+}
+.gate-hint a { color: #8ecf9e; text-decoration: none; }
+.gate-hint a:hover { text-decoration: underline; }
+.gate-hint code { background: rgba(255,255,255,.1); border-radius: 4px; padding: 1px 5px; }
+.gate-hint strong { color: rgba(255,255,255,.6); }
 
-  /* App shell */
-  #app { display: none; flex-direction: column; height: 100dvh; }
-  #app.visible { display: flex; }
+/* ── App shell ────────────────────────────────────────────────── */
+#app { display: none; height: 100vh; flex-direction: column; }
+#app.visible { display: flex; }
 
-  /* Toolbar */
-  #toolbar {
-    height: 50px; flex-shrink: 0;
-    background: #191c1a; border-bottom: 1px solid rgba(255,255,255,.06);
-    display: flex; align-items: center; justify-content: space-between; padding: 0 20px; gap: 16px;
-  }
-  .tb-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .tb-logo {
-    width: 28px; height: 28px; border-radius: 8px; background: #4a7c59;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .tb-logo svg { width: 14px; height: 14px; color: #fff; }
-  .tb-name { font-weight: 700; font-size: 13px; color: #fff; }
-  .tb-sep { color: rgba(255,255,255,.15); font-size: 13px; }
-  .tb-hint { font-size: 11px; color: rgba(255,255,255,.28); }
-  .tb-center { flex: 1; display: flex; justify-content: center; }
-  .tb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  #tb-status { font-size: 11px; color: rgba(255,255,255,.3); white-space: nowrap; transition: color .3s; }
-  #tb-status.ok { color: #8ecf9e; }
-  #tb-status.err { color: #f87171; }
-  .tb-img-label {
-    display: flex; align-items: center; gap: 6px; cursor: pointer;
-    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 10px;
-    padding: 6px 12px; font-size: 12px; color: rgba(255,255,255,.6); transition: all .15s;
-  }
-  .tb-img-label:hover { background: rgba(255,255,255,.1); color: #fff; }
-  .tb-img-label svg { width: 14px; height: 14px; }
-  .tb-pub {
-    display: flex; align-items: center; gap: 6px;
-    background: #4a7c59; border: none; border-radius: 10px;
-    padding: 7px 14px; font-size: 12px; font-weight: 700; color: #fff;
-    cursor: pointer; transition: background .15s;
-  }
-  .tb-pub:hover:not(:disabled) { background: #3d6b4a; }
-  .tb-pub:disabled { opacity: .45; cursor: not-allowed; }
-  .tb-pub svg { width: 13px; height: 13px; }
+/* ── Toolbar ──────────────────────────────────────────────────── */
+#toolbar {
+  height: 50px; flex-shrink: 0; z-index: 100; position: relative;
+  background: #191c1a; border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px;
+}
+.tb-left  { display: flex; align-items: center; gap: 10px; }
+.tb-right { display: flex; align-items: center; gap: 8px; }
+.tb-logo  {
+  width: 28px; height: 28px; border-radius: 8px; background: #4a7c59; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.tb-logo svg { width: 14px; height: 14px; color: #fff; }
+.tb-name { font-weight: 700; font-size: 13px; color: #fff; }
+.tb-sep  { color: rgba(255,255,255,.15); font-size: 13px; }
+.tb-hint { font-size: 11px; color: rgba(255,255,255,.28); }
+#status {
+  font-size: 11px; color: rgba(255,255,255,.32); white-space: nowrap;
+  transition: color .3s; padding: 0 4px;
+}
+#status.ok  { color: #8ecf9e; }
+#status.err { color: #f87171; }
+.tb-img-label {
+  display: flex; align-items: center; gap: 5px; cursor: pointer;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px; padding: 5px 11px; font-size: 11px; color: rgba(255,255,255,.5);
+  transition: all .15s; font-family: 'Nunito Sans', sans-serif; user-select: none;
+}
+.tb-img-label:hover { background: rgba(255,255,255,.1); color: #fff; }
+.tb-img-label svg { width: 13px; height: 13px; flex-shrink: 0; }
+#pub-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: #4a7c59; border: none; border-radius: 8px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #fff;
+  cursor: pointer; transition: background .15s; font-family: 'Nunito Sans', sans-serif;
+}
+#pub-btn:hover:not(:disabled) { background: #3d6b4a; }
+#pub-btn:disabled { opacity: .4; cursor: not-allowed; }
+#pub-btn svg { width: 13px; height: 13px; }
 
-  /* Iframe */
-  #frame-wrap { flex: 1; overflow: hidden; position: relative; }
-  #frame {
-    width: 100%; height: 100%; border: none; display: block;
-    background: #faf6f0;
-  }
-  #frame-loader {
-    position: absolute; inset: 0; background: #faf6f0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: rgba(46,50,48,.35); font-family: 'Nunito Sans', sans-serif;
-    transition: opacity .3s;
-  }
-  #frame-loader.hidden { opacity: 0; pointer-events: none; }
+/* ── GrapesJS container ───────────────────────────────────────── */
+#gjs { flex: 1; overflow: hidden; }
+
+/* ── GrapesJS dark theme overrides ───────────────────────────── */
+.gjs-editor { background: #141716 !important; }
+.gjs-pn-panel,
+.gjs-pn-panels { background: #191c1a !important; }
+.gjs-pn-commands { border-bottom: 1px solid rgba(255,255,255,.06) !important; }
+.gjs-pn-options  { border-bottom: 1px solid rgba(255,255,255,.06) !important; }
+.gjs-pn-views    { border-bottom: 1px solid rgba(255,255,255,.06) !important; }
+.gjs-pn-views-container { background: #1c1f1d !important; border-left: 1px solid rgba(255,255,255,.06) !important; }
+.gjs-block-categories,
+.gjs-blocks-c    { background: #1c1f1d !important; }
+.gjs-block       { background: #242826 !important; border-color: rgba(255,255,255,.08) !important; color: #ddd9d1 !important; }
+.gjs-block:hover { border-color: #4a7c59 !important; }
+.gjs-sm-sector   { background: #1c1f1d !important; border-color: rgba(255,255,255,.06) !important; }
+.gjs-sm-sector-title { background: #222624 !important; color: rgba(255,255,255,.7) !important; }
+.gjs-sm-property { color: #ddd9d1 !important; }
+.gjs-field       { background: #242826 !important; border-color: rgba(255,255,255,.1) !important; color: #ddd9d1 !important; }
+.gjs-field input { color: #ddd9d1 !important; }
+.gjs-layer       { background: #1c1f1d !important; border-color: rgba(255,255,255,.06) !important; color: #ddd9d1 !important; }
+.gjs-layer:hover { background: #242826 !important; }
+.gjs-layer.gjs-selected { background: rgba(74,124,89,.2) !important; }
+.gjs-pn-btn      { color: rgba(255,255,255,.55) !important; }
+.gjs-pn-btn:hover,
+.gjs-pn-btn.gjs-pn-active { color: #8ecf9e !important; }
+.gjs-toolbar     { background: rgba(74,124,89,.9) !important; }
+.gjs-resizer-c   { border-color: #4a7c59 !important; }
+.gjs-cv-canvas   { background: #f0ede8 !important; }
 </style>
 </head>
 <body>
 
-<!-- ─── PASSWORD GATE ─────────────────────────────────── -->
+<!-- ─── PASSWORD GATE ─────────────────────────────────────────── -->
 <div class="gate" id="gate-pw">
   <div class="gate-box">
     <div class="gate-logo">
@@ -119,7 +144,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
       </svg>
     </div>
-    <p class="gate-title font-hl">FS Editor</p>
+    <p class="gate-title">FS Editor</p>
     <p class="gate-sub">Zugangscode eingeben</p>
     <div class="gate-card">
       <input class="gate-input" type="password" id="pw-in" placeholder="Passwort" autocomplete="off"/>
@@ -129,26 +154,26 @@
   </div>
 </div>
 
-<!-- ─── TOKEN GATE ────────────────────────────────────── -->
+<!-- ─── TOKEN GATE ────────────────────────────────────────────── -->
 <div class="gate hidden" id="gate-tok">
-  <div class="gate-box" style="max-width:420px">
-    <p class="gate-title font-hl">GitHub Token</p>
-    <p class="gate-sub" style="margin-bottom:0">Zum Speichern benötigt · nur für diese Sitzung</p>
+  <div class="gate-box" style="max-width:440px">
+    <p class="gate-title">GitHub Token</p>
+    <p class="gate-sub">Einmalig pro Sitzung — wird nicht gespeichert</p>
     <div class="gate-card">
       <div class="gate-hint">
-        <strong>Token erstellen:</strong><br/>
-        1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=FS+Editor" target="_blank">github.com → Settings → Tokens → New classic token</a><br/>
-        2. Scope <code>repo</code> ankreuzen → Generate<br/>
+        <strong>Token erstellen (einmalig):</strong><br/>
+        1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=FS+Editor" target="_blank">github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</a><br/>
+        2. Scope <code>repo</code> ankreuzen → Generate token<br/>
         3. Token kopieren und unten einfügen
       </div>
-      <input class="gate-input" type="password" id="tok-in" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-family:monospace;color:#8ecf9e"/>
-      <button class="gate-btn" id="tok-btn">Verbinden &amp; weiter</button>
+      <input class="gate-input" type="password" id="tok-in" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-family:monospace; color:#8ecf9e"/>
+      <button class="gate-btn" id="tok-btn">Verbinden &amp; Editor starten</button>
       <p class="gate-err" id="tok-err"></p>
     </div>
   </div>
 </div>
 
-<!-- ─── APP ───────────────────────────────────────────── -->
+<!-- ─── EDITOR ────────────────────────────────────────────────── -->
 <div id="app">
   <div id="toolbar">
     <div class="tb-left">
@@ -162,15 +187,15 @@
       <span class="tb-hint">Text anklicken zum Bearbeiten</span>
     </div>
     <div class="tb-right">
-      <span id="tb-status"></span>
-      <label class="tb-img-label" title="Hintergrundbild der Hero-Sektion ersetzen">
+      <span id="status"></span>
+      <label class="tb-img-label" title="Hero-Hintergrundbild ersetzen">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
         </svg>
         Hintergrundbild
-        <input type="file" id="img-in" accept="image/*" style="display:none" onchange="onImgPick(this)"/>
+        <input type="file" id="img-in" accept="image/*" style="display:none"/>
       </label>
-      <button class="tb-pub" id="pub-btn" onclick="publish()">
+      <button id="pub-btn">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"/>
         </svg>
@@ -178,33 +203,29 @@
       </button>
     </div>
   </div>
-
-  <div id="frame-wrap">
-    <div id="frame-loader">Seite wird geladen…</div>
-    <iframe id="frame" title="Editor"></iframe>
-  </div>
+  <div id="gjs"></div>
 </div>
 
+<script src="https://unpkg.com/grapesjs"></script>
+<script src="https://unpkg.com/grapesjs-preset-webpage"></script>
 <script>
-// ─── Config ───────────────────────────────────────────────────────────────
-const PW       = 'Stitch2026';       // ← Passwort hier ändern
+const PW       = 'Stitch2026';
 const REPO     = 'johannemraa/stitch';
 const HTMLFILE = 'index.html';
 const IMGFILE  = 'background_image.png';
 
-// ─── State ────────────────────────────────────────────────────────────────
-let rawHtml      = '';
 let ghToken      = '';
-let edits        = {};   // key → new plain-text value (from iframe postMessage)
-let pendingImage = null;
+let gjsEditor    = null;
+let storedScripts = '';
+let pendingImage  = null;
 
-// ─── Auth ─────────────────────────────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────
 function unlock() {
   if (document.getElementById('pw-in').value === PW) {
     document.getElementById('gate-pw').classList.add('hidden');
     const t = sessionStorage.getItem('fs_tok');
     if (t) { ghToken = t; initApp(); }
-    else    { document.getElementById('gate-tok').classList.remove('hidden'); }
+    else   { document.getElementById('gate-tok').classList.remove('hidden'); }
   } else {
     showErr('pw-err', 'Falsches Passwort');
   }
@@ -214,7 +235,7 @@ function saveToken() {
   const v = document.getElementById('tok-in').value.trim();
   if (!v) { showErr('tok-err', 'Bitte Token eingeben'); return; }
   ghToken = v;
-  sessionStorage.setItem('fs_tok', ghToken);
+  sessionStorage.setItem('fs_tok', v);
   document.getElementById('gate-tok').classList.add('hidden');
   initApp();
 }
@@ -225,188 +246,65 @@ function showErr(id, msg) {
   setTimeout(() => el.textContent = '', 3000);
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────
 async function initApp() {
   document.getElementById('app').classList.add('visible');
-  setStatus('Lade…');
+  setStatus('Wird geladen…');
   try {
-    const data = await ghGet(HTMLFILE);
-    rawHtml = decode64(data.content);
-    loadFrame(rawHtml);
+    const file = await ghGet(HTMLFILE);
+    setupEditor(decode64(file.content));
     setStatus('');
   } catch(e) {
     setStatus('Ladefehler — Token prüfen', 'err');
   }
 }
 
-// ─── Prepare HTML for iframe ──────────────────────────────────────────────
-function prepareHtml(html) {
-  // Remove Leaflet CSS + JS
-  html = html.replace(/<link[^>]*leaflet[^>]*>/gi, '');
-  html = html.replace(/<script[^>]*leaflet[^>]*><\/script>/gi, '');
-  // Remove GSAP
-  html = html.replace(/<script[^>]*gsap[^>]*><\/script>/gi, '');
-  // Remove the main inline <script> block (last one in <body>)
-  const lastOpen  = html.lastIndexOf('<script>');
-  const lastClose = html.lastIndexOf('<\/script>');
-  if (lastOpen !== -1 && lastClose > lastOpen) {
-    html = html.slice(0, lastOpen) + html.slice(lastClose + 9);
-  }
-  // Convert EDIT markers → clickable spans
-  html = html.replace(
-    /<!-- EDIT:([\w-]+) -->([\s\S]*?)<!-- \/EDIT:\1 -->/g,
-    (_, key, content) => `<span data-edit="${key}">${content.trim()}</span>`
-  );
-  // Inject editor styles + script before </body>
-  html = html.replace('</body>', EDITOR_INJECT + '\n</body>');
-  return html;
-}
+// ── Setup GrapesJS ─────────────────────────────────────────────
+function setupEditor(html) {
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(html, 'text/html');
 
-// ─── Injected code (runs inside iframe) ───────────────────────────────────
-const EDITOR_INJECT = `
-<style>
-  /* Show elements that rely on JS scroll animations */
-  .js-up,.js-right,.js-fade{opacity:1!important;transform:none!important;}
-  /* Editable element styles */
-  [data-edit]{
-    cursor:text!important;
-    outline:2px solid transparent;
-    outline-offset:3px;
-    border-radius:3px;
-    transition:outline-color .12s;
-  }
-  [data-edit]:hover{outline-color:rgba(74,124,89,.38)!important;}
-  [data-edit][contenteditable="true"]{
-    outline-color:rgba(74,124,89,.75)!important;
-    outline-offset:4px;
-  }
-  /* Tooltip */
-  .fs-tip{
-    position:fixed;
-    background:#1c1f1d;
-    color:#ddd9d1;
-    font:600 11px/1 'Nunito Sans',sans-serif;
-    padding:5px 10px;
-    border-radius:7px;
-    pointer-events:none;
-    z-index:99999;
-    white-space:nowrap;
-    opacity:0;
-    transition:opacity .12s;
-    box-shadow:0 2px 10px rgba(0,0,0,.35);
-  }
-</style>
-<script>
-(function(){
-  // Block form submissions and external link navigations
-  document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
-  document.querySelectorAll('a:not([href^="#"])').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+  // Preserve <script> tags in body — GrapesJS strips them
+  const scripts = Array.from(doc.body.querySelectorAll('script'));
+  storedScripts  = scripts.map(s => s.outerHTML).join('\n');
+  scripts.forEach(s => s.remove());
 
-  // Tooltip
-  const tip = document.createElement('div');
-  tip.className = 'fs-tip';
-  tip.textContent = 'Klicken zum Bearbeiten';
-  document.body.appendChild(tip);
+  const headHtml = doc.head.innerHTML;
+  const bodyHtml = doc.body.innerHTML;
 
-  let cur = null;
+  gjsEditor = grapesjs.init({
+    container: '#gjs',
+    fromElement: false,
+    height: '100%',
+    storageManager: false,
+    undoManager: { trackChanges: true },
 
-  document.querySelectorAll('[data-edit]').forEach(el=>{
-    el.addEventListener('mouseenter', e=>{
-      if(el===cur) return;
-      tip.style.opacity='1';
-      positionTip(e);
-    });
-    el.addEventListener('mousemove', positionTip);
-    el.addEventListener('mouseleave', ()=>{ tip.style.opacity='0'; });
+    components: bodyHtml,
 
-    el.addEventListener('click', e=>{
-      e.stopPropagation();
-      tip.style.opacity='0';
-      if(cur && cur!==el) commitEl(cur);
-      cur = el;
-      el.contentEditable = 'true';
-      el.focus();
-      // Select all text
-      const r = document.createRange();
-      r.selectNodeContents(el);
-      const s = window.getSelection();
-      s.removeAllRanges();
-      s.addRange(r);
-    });
+    // Inject the real page head so Tailwind, fonts & colours render correctly
+    canvas: {
+      frameContent: '<!DOCTYPE html><html lang="de"><head>' + headHtml + '</head><body></body></html>'
+    },
 
-    el.addEventListener('blur', ()=>{
-      if(cur===el){
-        commitEl(el);
-        el.contentEditable = 'inherit';
-        cur = null;
+    plugins: ['gjs-preset-webpage'],
+    pluginsOpts: {
+      'gjs-preset-webpage': {
+        blocks: [],           // no extra drag-drop blocks
+        textCleanCanvas: false,
+        showStylesOnChange: true,
+        modalImportTitle: 'HTML importieren',
+        modalImportButton: 'Importieren',
       }
-    });
-
-    el.addEventListener('keydown', e=>{
-      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); el.blur(); }
-      if(e.key==='Escape') el.blur();
-    });
+    },
   });
-
-  document.addEventListener('click', e=>{
-    if(cur && !e.target.closest('[data-edit]')) cur.blur();
-  });
-
-  function commitEl(el){
-    window.parent.postMessage({ type:'edit', key:el.dataset.edit, value:el.innerText.trim() }, '*');
-  }
-
-  function positionTip(e){
-    tip.style.left = (e.clientX + 14) + 'px';
-    tip.style.top  = (e.clientY - 34) + 'px';
-  }
-
-  window.parent.postMessage({ type:'ready' }, '*');
-})();
-<\/script>`;
-
-// ─── Load iframe ──────────────────────────────────────────────────────────
-function loadFrame(html) {
-  const prepared = prepareHtml(html);
-  const frame    = document.getElementById('frame');
-  const loader   = document.getElementById('frame-loader');
-  frame.srcdoc   = prepared;
-  frame.onload   = () => loader.classList.add('hidden');
 }
 
-// ─── Handle messages from iframe ─────────────────────────────────────────
-window.addEventListener('message', e => {
-  if (!e.data) return;
-  if (e.data.type === 'edit') {
-    edits[e.data.key] = e.data.value;
-  }
-  if (e.data.type === 'ready') {
-    document.getElementById('frame-loader').classList.add('hidden');
-  }
-});
-
-// ─── Image pick ───────────────────────────────────────────────────────────
-function onImgPick(input) {
-  const file = input.files[0];
-  if (!file) return;
-  pendingImage = file;
-  setStatus('Bild ausgewählt: ' + file.name);
-  input.value = '';
-}
-
-// ─── Publish ──────────────────────────────────────────────────────────────
+// ── Publish ────────────────────────────────────────────────────
 async function publish() {
+  if (!gjsEditor) return;
   const btn = document.getElementById('pub-btn');
   btn.disabled = true;
   try {
-    let html = rawHtml;
-
-    // Apply all collected text edits
-    for (const [key, val] of Object.entries(edits)) {
-      html = updateMarker(html, key, encodeEnts(val));
-    }
-
-    // Upload image if picked
     if (pendingImage) {
       setStatus('Bild wird hochgeladen…');
       await uploadImage(pendingImage);
@@ -414,9 +312,30 @@ async function publish() {
     }
 
     setStatus('Wird gespeichert…');
-    await commitFile(HTMLFILE, html, 'Inhalt aktualisiert via FS Editor');
-    rawHtml = html;
-    edits   = {};
+
+    // Get current file (need SHA for GitHub API)
+    const file = await ghGet(HTMLFILE);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(decode64(file.content), 'text/html');
+
+    // Replace body with GrapesJS output + preserved scripts
+    doc.body.innerHTML = gjsEditor.getHtml() + '\n' + storedScripts;
+
+    // Inject any custom CSS GrapesJS generated
+    const css = gjsEditor.getCss();
+    if (css && css.trim()) {
+      let styleEl = doc.getElementById('gjs-css');
+      if (!styleEl) {
+        styleEl = doc.createElement('style');
+        styleEl.id = 'gjs-css';
+        doc.head.appendChild(styleEl);
+      }
+      styleEl.textContent = css;
+    }
+
+    const fullHtml = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    await commitFile(HTMLFILE, fullHtml, file.sha, 'Inhalt aktualisiert via FS Editor');
+
     setStatus('✓ Veröffentlicht — Vercel deployt in ~30 Sek.', 'ok');
     setTimeout(() => setStatus(''), 8000);
   } catch(e) {
@@ -425,56 +344,45 @@ async function publish() {
   btn.disabled = false;
 }
 
-// ─── GitHub helpers ───────────────────────────────────────────────────────
-async function ghGet(path) {
-  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-    headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' }
-  });
-  if (!r.ok) throw new Error(`GitHub ${r.status}`);
-  return r.json();
-}
-
-async function commitFile(path, content, message) {
-  const file = await ghGet(path);
-  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-    method: 'PUT',
-    headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, content: encode64(content), sha: file.sha })
-  });
-  if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Commit fehlgeschlagen'); }
-}
-
+// ── Image upload ───────────────────────────────────────────────
 async function uploadImage(file) {
   const b64 = await new Promise((res, rej) => {
     const r = new FileReader();
-    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onload  = e => res(e.target.result.split(',')[1]);
     r.onerror = rej;
     r.readAsDataURL(file);
   });
   let sha;
-  try { const f = await ghGet(IMGFILE); sha = f.sha; } catch {}
+  try { sha = (await ghGet(IMGFILE)).sha; } catch {}
   const body = { message: 'Hintergrundbild aktualisiert', content: b64 };
   if (sha) body.sha = sha;
-  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${IMGFILE}`, {
+  const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/' + IMGFILE, {
     method: 'PUT',
-    headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   if (!r.ok) throw new Error('Bild-Upload fehlgeschlagen');
 }
 
-// ─── Content helpers ──────────────────────────────────────────────────────
-function updateMarker(html, key, value) {
-  return html.replace(
-    new RegExp(`<!-- EDIT:${key} -->[\\s\\S]*?<!-- /EDIT:${key} -->`),
-    `<!-- EDIT:${key} -->${value}<!-- /EDIT:${key} -->`
-  );
+// ── GitHub API ─────────────────────────────────────────────────
+async function ghGet(path) {
+  const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/' + path, {
+    headers: { Authorization: 'token ' + ghToken, Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error('GitHub ' + r.status);
+  return r.json();
 }
 
-function encodeEnts(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+async function commitFile(path, content, sha, message) {
+  const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/' + path, {
+    method: 'PUT',
+    headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, content: encode64(content), sha })
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Commit fehlgeschlagen'); }
 }
 
+// ── Helpers ────────────────────────────────────────────────────
 function encode64(str) {
   const bytes = new TextEncoder().encode(str);
   let bin = '';
@@ -489,18 +397,21 @@ function decode64(b64) {
 }
 
 function setStatus(msg, type = '') {
-  const el = document.getElementById('tb-status');
+  const el = document.getElementById('status');
   el.textContent = msg;
-  el.className = type;
+  el.className   = type;
 }
 
-// ─── Button wiring ────────────────────────────────────────────────────────
+// ── Wire up ────────────────────────────────────────────────────
 document.getElementById('pw-btn').addEventListener('click', unlock);
 document.getElementById('tok-btn').addEventListener('click', saveToken);
-
-// ─── Keyboard shortcuts ───────────────────────────────────────────────────
-document.getElementById('pw-in').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+document.getElementById('pw-in').addEventListener('keydown',  e => { if (e.key === 'Enter') unlock(); });
 document.getElementById('tok-in').addEventListener('keydown', e => { if (e.key === 'Enter') saveToken(); });
+document.getElementById('img-in').addEventListener('change',  e => {
+  const f = e.target.files[0];
+  if (f) { pendingImage = f; setStatus('Bild ausgewählt: ' + f.name); }
+});
+document.getElementById('pub-btn').addEventListener('click', publish);
 </script>
 </body>
 </html>
