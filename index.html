@@ -251,6 +251,13 @@ tailwind.config = {
     font-family: 'Literata', serif;
     font-size: 1.1rem; font-weight: 700;
     color: #4a7c59; flex-shrink: 0;
+    position: relative; overflow: hidden;
+  }
+  .t-avatar-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; border-radius: 50%;
+    transition: opacity 0.2s;
   }
   .t-stack-outer { position: relative; min-height: 380px; }
   @media (max-width: 767px) {
@@ -772,91 +779,114 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 60);
 }, { passive: true });
 
-// ── Animated Testimonials ──
-const testimonials = [
-  {
-    name: 'G. Bauer',
-    initials: 'GB',
-    role: 'Privatkundin',
-    service: 'Gartenpflege',
-    rating: 5,
-    quote: '„Herr Sijarina ist absolut zuverlässig! Unser Garten wird seit Jahren von ihm gepflegt — immer pünktlich, sauber und zu einem fairen Preis. Ich würde ihn jederzeit weiterempfehlen!"',
-  },
-  {
-    name: 'K. Hoffmann',
-    initials: 'KH',
-    role: 'Hausbesitzer',
-    service: 'Winterdienst',
-    rating: 5,
-    quote: '„Der Winterdienst war diesen Winter ein Segen. Egal wie früh es schneite — Eingang und Zufahrt waren immer geräumt und gestreut. Professionell, verlässlich und absolut empfehlenswert."',
-  },
-  {
-    name: 'S. Meier',
-    initials: 'SM',
-    role: 'WEG-Verwalterin',
-    service: 'Treppenhausreinigung',
-    rating: 5,
-    quote: '„Unser Treppenhaus wird regelmäßig von FS-Hausmeisterservice gereinigt — immer makellos und zuverlässig. Das Team arbeitet sorgfältig und mit einem freundlichen Auftreten. Top!"',
-  },
-  {
-    name: 'A. Weber',
-    initials: 'AW',
-    role: 'Privatkunde',
-    service: 'Komplettbetreuung',
-    rating: 5,
-    quote: '„Seit Jahren beauftrage ich FS-Hausmeisterservice für Gartenpflege und Grundreinigung. Die Qualität stimmt und die Zusammenarbeit ist unkompliziert. Immer wieder gerne!"',
-  },
-  {
-    name: 'T. Fischer',
-    initials: 'TF',
-    role: 'Immobilienbesitzer',
-    service: 'Fenster- & Dachrinnenreinigung',
-    rating: 5,
-    quote: '„Super schnelle Reaktionszeit, sehr professionell und faire Preise. Fenster- und Dachrinnenreinigung wurden gründlich und ohne jede Beanstandung erledigt. Absolute Empfehlung!"',
-  },
-];
+// ── Google Reviews ──
+const GKEY     = 'AIzaSyB_WHDNhwEO_DxDghd2vtjDjo_koQZMgi0';
+const GR_CACHE = 'fs_gr_v2';
+const GR_TTL   = 24 * 60 * 60 * 1000; // refresh once a day
 
 let currentT = 0;
 let tAutoTimer = null;
+let activeReviews = [];
 
-function buildTestimonials() {
+async function loadGoogleReviews() {
+  // Return cached data if still fresh
+  try {
+    const c = JSON.parse(localStorage.getItem(GR_CACHE) || 'null');
+    if (c && (Date.now() - c.ts) < GR_TTL) return c.data;
+  } catch {}
+
+  // Step 1: text search → get place resource name + overview stats
+  const sRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': GKEY,
+      'X-Goog-FieldMask': 'places.name,places.rating,places.userRatingCount',
+    },
+    body: JSON.stringify({ textQuery: 'FS-Hausmeisterservice Starnberg', languageCode: 'de' }),
+  });
+  const sData = await sRes.json();
+  const place = sData.places?.[0];
+  if (!place) throw new Error('Place not found');
+
+  // Step 2: place details → reviews with author photos
+  const dRes = await fetch(`https://places.googleapis.com/v1/${place.name}`, {
+    headers: {
+      'X-Goog-Api-Key': GKEY,
+      'X-Goog-FieldMask': 'rating,userRatingCount,reviews',
+    },
+  });
+  const detail = await dRes.json();
+
+  const data = {
+    rating: detail.rating ?? place.rating ?? 5,
+    total:  detail.userRatingCount ?? place.userRatingCount ?? 0,
+    reviews: (detail.reviews || []).map(r => ({
+      name:  r.authorAttribution?.displayName || 'Anonym',
+      photo: r.authorAttribution?.photoUri    || null,
+      rating: r.rating,
+      text:  r.text?.text || '',
+      when:  r.relativePublishTimeDescription || '',
+    })),
+  };
+
+  try { localStorage.setItem(GR_CACHE, JSON.stringify({ ts: Date.now(), data })); } catch {}
+  return data;
+}
+
+function nameInitials(name) {
+  return name.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
+}
+
+function buildTestimonials(reviews) {
+  // Only display 4★ and 5★ reviews
+  activeReviews = reviews.filter(r => r.rating >= 4);
   const stack = document.getElementById('t-stack');
   const dotsContainer = document.getElementById('t-dots');
 
-  // Build cards
-  testimonials.forEach((t, i) => {
+  // Clear any existing cards + dots
+  Array.from(stack.querySelectorAll('.t-card')).forEach(c => c.remove());
+  dotsContainer.innerHTML = '';
+  currentT = 0;
+
+  if (!activeReviews.length) return;
+
+  const googleLogoSvg = `<svg class="w-4 h-4 opacity-40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+  </svg>`;
+
+  activeReviews.forEach((t, i) => {
     const card = document.createElement('div');
     card.className = 't-card' + (i === 0 ? ' t-active' : '');
     card.id = 't-card-' + i;
+    const ini = nameInitials(t.name);
+    // Profile photo overlays the initials; if load fails opacity goes to 0, showing initials
+    const photoHtml = t.photo
+      ? `<img src="${t.photo}" alt="" class="t-avatar-img" onerror="this.style.opacity='0'">`
+      : '';
     card.innerHTML = `
       <div class="t-stars mb-5">${'★'.repeat(t.rating)}</div>
       <div class="relative flex-1 mb-1">
         <span class="t-quote-glyph" aria-hidden="true">"</span>
-        <p class="font-body text-lg text-on-surface leading-relaxed italic">${t.quote}</p>
+        <p class="font-body text-lg text-on-surface leading-relaxed italic">${t.text || '–'}</p>
       </div>
       <hr class="t-sep"/>
       <div class="flex items-center gap-4">
-        <div class="t-avatar">${t.initials}</div>
+        <div class="t-avatar">${ini}${photoHtml}</div>
         <div>
           <div class="font-headline font-bold text-on-surface text-base">${t.name}</div>
-          <div class="font-body text-sm text-on-surface-variant mt-0.5">${t.service}</div>
-          <div class="font-body text-xs text-on-surface-variant/70">${t.role}</div>
+          ${t.when ? `<div class="font-body text-xs text-on-surface-variant/70 mt-0.5">${t.when}</div>` : ''}
         </div>
-        <div class="ml-auto">
-          <svg class="w-4 h-4 opacity-40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-        </div>
+        <div class="ml-auto">${googleLogoSvg}</div>
       </div>`;
-    // Insert before the decorative divs (last 2 children)
     stack.insertBefore(card, stack.children[stack.children.length - 2]);
   });
 
-  // Build dots
-  testimonials.forEach((_, i) => {
+  // Navigation dots
+  activeReviews.forEach((_, i) => {
     const dot = document.createElement('button');
     dot.className = 't-dot' + (i === 0 ? ' t-dot-active' : '');
     dot.setAttribute('aria-label', `Bewertung ${i + 1}`);
@@ -865,38 +895,50 @@ function buildTestimonials() {
   });
 }
 
+function updateOverallRating(rating, total) {
+  const rEl = document.querySelector('#bewertungen .font-display.text-5xl');
+  const cEl = document.querySelector('#bewertungen .font-body.text-xs.text-on-surface-variant');
+  if (rEl) rEl.textContent = rating.toFixed(1).replace('.', ',');
+  if (cEl) cEl.textContent = `${total} Google-Bewertungen`;
+  // Update stars display
+  const starsEl = document.querySelector('#bewertungen .t-stars');
+  if (starsEl) {
+    const full = Math.round(rating);
+    starsEl.textContent = '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+}
+
 function switchT(i) {
   if (i === currentT) return;
-
-  // Deactivate current
   const prevCard = document.getElementById('t-card-' + currentT);
   if (prevCard) prevCard.classList.remove('t-active');
-
-  // Update dots
   document.querySelectorAll('.t-dot').forEach((dot, idx) => {
     dot.classList.toggle('t-dot-active', idx === i);
   });
-
   currentT = i;
-
-  // Activate new card (small delay so exit animation plays)
   setTimeout(() => {
     const nextCard = document.getElementById('t-card-' + currentT);
     if (nextCard) nextCard.classList.add('t-active');
   }, 40);
-
   resetAutoRotate();
 }
 
 function resetAutoRotate() {
   clearInterval(tAutoTimer);
   tAutoTimer = setInterval(() => {
-    switchT((currentT + 1) % testimonials.length);
+    switchT((currentT + 1) % Math.max(1, activeReviews.length));
   }, 6000);
 }
 
-buildTestimonials();
-resetAutoRotate();
+loadGoogleReviews()
+  .then(data => {
+    buildTestimonials(data.reviews);
+    updateOverallRating(data.rating, data.total);
+    resetAutoRotate();
+  })
+  .catch(err => {
+    console.warn('Google Reviews konnte nicht geladen werden:', err);
+  });
 
 // ── Submission storage helpers ──
 function fsLoadSubmissions() {
