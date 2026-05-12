@@ -265,12 +265,49 @@ function setupEditor(html) {
   const doc    = parser.parseFromString(html, 'text/html');
 
   // Preserve <script> tags in body — GrapesJS strips them
-  const scripts = Array.from(doc.body.querySelectorAll('script'));
-  storedScripts  = scripts.map(s => s.outerHTML).join('\n');
-  scripts.forEach(s => s.remove());
-
-  const headHtml = doc.head.innerHTML;
+  const bodyScripts = Array.from(doc.body.querySelectorAll('script'));
+  storedScripts = bodyScripts.map(s => s.outerHTML).join('\n');
+  bodyScripts.forEach(s => s.remove());
   const bodyHtml = doc.body.innerHTML;
+
+  // Build a minimal canvas head — Tailwind + fonts only.
+  // GSAP, Leaflet & ScrollTrigger are intentionally excluded: they throw
+  // errors in the canvas iframe and prevent components from rendering.
+  const SC = '<' + '/script>';  // safe closing tag — avoids ending this script block
+
+  // All <link> tags except Leaflet CSS
+  const linkTags = Array.from(doc.head.querySelectorAll('link'))
+    .filter(l => !l.href.includes('leaflet'))
+    .map(l => l.outerHTML)
+    .join('\n');
+
+  // Tailwind config inline script (must come BEFORE the CDN so config is ready)
+  let twConfigHtml = '';
+  Array.from(doc.head.querySelectorAll('script:not([src])')).forEach(s => {
+    if (s.textContent.includes('tailwind.config')) {
+      twConfigHtml = '<script>' + s.textContent.trim() + SC;
+    }
+  });
+
+  // Tailwind CDN script only (skip GSAP, Leaflet, ScrollTrigger)
+  const cdnScripts = Array.from(doc.head.querySelectorAll('script[src]'))
+    .filter(s => s.src.includes('tailwindcss'))
+    .map(s => '<script src="' + s.src + '">' + SC)
+    .join('\n');
+
+  // Custom inline <style> blocks (body font, colours)
+  const styleBlocks = Array.from(doc.head.querySelectorAll('style'))
+    .map(s => '<style>' + s.textContent + '</style>')
+    .join('\n');
+
+  const frameContent = '<!DOCTYPE html><html lang="de"><head>\n' +
+    '<meta charset="utf-8"/>\n' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n' +
+    linkTags + '\n' +
+    twConfigHtml + '\n' +
+    cdnScripts + '\n' +
+    styleBlocks + '\n' +
+    '<' + '/head><body><' + '/body><' + '/html>';
 
   gjsEditor = grapesjs.init({
     container: '#gjs',
@@ -281,15 +318,12 @@ function setupEditor(html) {
 
     components: bodyHtml,
 
-    // Inject the real page head so Tailwind, fonts & colours render correctly
-    canvas: {
-      frameContent: '<!DOCTYPE html><html lang="de"><head>' + headHtml + '</head><body></body></html>'
-    },
+    canvas: { frameContent },
 
     plugins: ['gjs-preset-webpage'],
     pluginsOpts: {
       'gjs-preset-webpage': {
-        blocks: [],           // no extra drag-drop blocks
+        blocks: [],
         textCleanCanvas: false,
         showStylesOnChange: true,
         modalImportTitle: 'HTML importieren',
