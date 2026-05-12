@@ -254,7 +254,12 @@ tailwind.config = {
     color: #4a7c59; flex-shrink: 0;
   }
   .t-stack-outer { position: relative; min-height: 380px; }
-  @media (max-width: 767px) { .t-stack-outer { min-height: 460px; } }
+  @media (max-width: 767px) {
+    .t-stack-outer { min-height: 400px; }
+    .t-card { padding: 1.5rem; }
+    .t-card p { font-size: 1rem; line-height: 1.6; }
+    .t-quote-glyph { font-size: 3rem; }
+  }
 
   /* ── Expand-Map Cards ── */
   .ec-grid {
@@ -1125,7 +1130,8 @@ function buildTestimonials() {
         <div class="t-avatar">${t.initials}</div>
         <div>
           <div class="font-headline font-bold text-on-surface text-base">${t.name}</div>
-          <div class="font-body text-sm text-on-surface-variant mt-0.5">${t.service} · ${t.role}</div>
+          <div class="font-body text-sm text-on-surface-variant mt-0.5">${t.service}</div>
+          <div class="font-body text-xs text-on-surface-variant/70">${t.role}</div>
         </div>
         <div class="ml-auto">
           <svg class="w-4 h-4 opacity-40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
