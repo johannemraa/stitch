@@ -299,8 +299,9 @@ function setupEditor(html) {
       ],
     },
 
-    // protectedCss is added as a <style> block inside the canvas iframe
-    protectedCss: inlineCss,
+    // protectedCss is added as a <style> block inside the canvas iframe.
+    // The override at the end forces scroll-animation classes visible (they start at opacity:0).
+    protectedCss: inlineCss + '\n.js-up,.js-right,.js-fade{opacity:1!important;transform:none!important;}',
 
     plugins: ['gjs-preset-webpage'],
     pluginsOpts: {
