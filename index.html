@@ -236,10 +236,9 @@ tailwind.config = {
     font-size: 4.5rem;
     line-height: 0.75;
     color: rgba(74,124,89,0.15);
-    display: block;
+    position: absolute; top: -6px; right: 0;
     transform: rotate(180deg);
-    margin-bottom: 0.25rem;
-    user-select: none;
+    user-select: none; pointer-events: none;
   }
   .t-sep { border: none; border-top: 1px solid rgba(196,200,188,0.6); margin: 1.25rem 0; }
   .t-avatar {
@@ -278,7 +277,7 @@ tailwind.config = {
     .t-stack-outer { min-height: 400px; }
     .t-card { padding: 1.5rem; }
     .t-card p { font-size: 1rem; line-height: 1.6; }
-    .t-quote-glyph { font-size: 3rem; }
+    .t-quote-glyph { font-size: 3rem; top: -4px; }
   }
 
   /* ── Expand-Map Cards ── */
@@ -573,10 +572,9 @@ tailwind.config = {
     font-size: 4.5rem;
     line-height: 0.75;
     color: rgba(74,124,89,0.15);
-    display: block;
+    position: absolute; top: -6px; right: 0;
     transform: rotate(180deg);
-    margin-bottom: 0.25rem;
-    user-select: none;
+    user-select: none; pointer-events: none;
   }
   .t-sep { border: none; border-top: 1px solid rgba(196,200,188,0.6); margin: 1.25rem 0; }
   .t-avatar {
@@ -594,7 +592,7 @@ tailwind.config = {
     .t-stack-outer { min-height: 400px; }
     .t-card { padding: 1.5rem; }
     .t-card p { font-size: 1rem; line-height: 1.6; }
-    .t-quote-glyph { font-size: 3rem; }
+    .t-quote-glyph { font-size: 3rem; top: -4px; }
   }
 
   /* ── Expand-Map Cards ── */
@@ -907,14 +905,15 @@ function buildTestimonials(reviews) {
     dotsContainer.appendChild(dot);
   });
 
-  // Show "Mehr lesen" only on cards whose text is actually clamped
-  requestAnimationFrame(() => {
+  // Show "Mehr lesen" only on cards whose text is actually clamped.
+  // setTimeout gives the browser time to fully paint and measure line heights.
+  setTimeout(() => {
     activeReviews.forEach((_, i) => {
       const p   = document.querySelector('#t-card-' + i + ' .t-quote-text');
       const btn = document.querySelector('#t-card-' + i + ' .t-read-more');
       if (p && btn && p.scrollHeight > p.clientHeight + 2) btn.style.display = 'block';
     });
-  });
+  }, 200);
 }
 
 // Expand / collapse a review card
@@ -924,11 +923,11 @@ window.tToggleExpand = function(btn) {
   const expanded = card.classList.toggle('t-expanded');
   btn.textContent = expanded ? '↑ Weniger' : 'Mehr lesen ↓';
   if (expanded) {
-    requestAnimationFrame(() => {
-      stack.style.minHeight = (card.scrollHeight + 8) + 'px';
-    });
+    clearInterval(tAutoTimer); // pause carousel while reading
+    setTimeout(() => { stack.style.minHeight = (card.scrollHeight + 8) + 'px'; }, 20);
   } else {
     stack.style.minHeight = '';
+    resetAutoRotate(); // resume carousel
   }
 };
 
@@ -948,7 +947,16 @@ function updateOverallRating(rating, total) {
 function switchT(i) {
   if (i === currentT) return;
   const prevCard = document.getElementById('t-card-' + currentT);
-  if (prevCard) prevCard.classList.remove('t-active');
+  if (prevCard) {
+    prevCard.classList.remove('t-active');
+    // Collapse expanded review when sliding away
+    if (prevCard.classList.contains('t-expanded')) {
+      prevCard.classList.remove('t-expanded');
+      const btn = prevCard.querySelector('.t-read-more');
+      if (btn) btn.textContent = 'Mehr lesen ↓';
+      document.getElementById('t-stack').style.minHeight = '';
+    }
+  }
   document.querySelectorAll('.t-dot').forEach((dot, idx) => {
     dot.classList.toggle('t-dot-active', idx === i);
   });
