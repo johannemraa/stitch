@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Garten- & Landschaftspflege — FS-Hausmeisterservice Starnberg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,300..700;1,6..12,300..400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#4a7c59",
+        "on-primary": "#ffffff",
+        "on-surface": "#2e3230",
+        "on-surface-variant": "#4a4e4a",
+        "outline": "#74796e",
+        "outline-variant": "#c4c8bc",
+        "background": "#faf6f0",
+        "surface": "#faf6f0",
+        "surface-container-low": "#f5f1ea",
+        "surface-container": "#f0ece4",
+        "inverse-surface": "#2e3230",
+        "inverse-on-surface": "#f5f0e8",
+      },
+      fontFamily: {
+        headline: ['"Literata"', 'Georgia', 'serif'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        body: ['"Nunito Sans"', 'sans-serif'],
+        label: ['"Nunito Sans"', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Nunito Sans', sans-serif; background-color: #faf6f0; color: #2e3230; }
+  .gallery-img-wrap { position: relative; overflow: hidden; border-radius: 16px; }
+  .gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .gallery-img-wrap:hover .gallery-img { transform: scale(1.04); }
+</style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+<nav class="sticky top-0 z-50 border-b border-outline-variant/20" style="background:rgba(250,246,240,0.97);backdrop-filter:blur(16px);">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12 h-[72px] flex items-center justify-between">
+    <a href="index.html" class="font-headline text-xl font-bold text-on-surface tracking-tight">FS-Hausmeisterservice</a>
+    <a href="index.html#leistungen" class="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-75 transition-opacity font-label">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+      Zurück zur Startseite
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="relative h-[52vh] min-h-[300px] overflow-hidden">
+  <img src="hero_garden.png" alt="Gartenpflege Starnberg" class="w-full h-full object-cover" style="object-position:center 40%;">
+  <div class="absolute inset-0" style="background:linear-gradient(to bottom,rgba(46,50,48,0.25) 0%,rgba(46,50,48,0.55) 100%);"></div>
+  <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <span class="text-on-primary/70 text-[11px] font-bold tracking-[0.25em] uppercase font-label mb-3">Leistung 01</span>
+    <h1 class="font-headline text-[2.8rem] md:text-[4rem] font-bold text-on-primary leading-tight">Garten- & Landschaftspflege</h1>
+    <p class="font-body text-on-primary/80 text-lg mt-3 max-w-xl">Ihr Außenbereich. Das ganze Jahr gepflegt.</p>
+  </div>
+</div>
+
+<main class="flex-grow">
+
+  <!-- Intro -->
+  <section class="py-20 bg-surface">
+    <div class="max-w-[860px] mx-auto px-6 md:px-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-7 h-px bg-primary"></div>
+        <span class="text-primary text-[11px] font-bold tracking-[0.22em] uppercase font-label">Was wir für Sie tun</span>
+      </div>
+      <p class="font-body text-on-surface-variant text-lg leading-relaxed mb-8">
+        Ein gepflegter Garten ist mehr als Ästhetik — er ist der erste Eindruck Ihrer Immobilie. FS-Hausmeisterservice übernimmt die gesamte Garten- und Grünpflege zuverlässig, sorgfältig und termingerecht. Von der regelmäßigen Rasenpflege bis zur kompletten Gartenrevitalisierung.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">yard</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Rasenpflege</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Regelmäßiges Mähen, Kantenschnitt, Vertikutieren und Düngen für einen satten, ebenmäßigen Rasen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">content_cut</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Heckenschnitt</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Formschnitt und Pflege von Hecken, Buchsbaum und Ziersträuchern. Präzise und fachgerecht.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">psychiatry</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Unkrautbekämpfung</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Mechanische Entfernung von Unkraut auf Beeten, Wegen und Pflasterflächen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">park</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Gartenrevitalisierung</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Neugestaltung, Bodenpflege, Bepflanzung und Aufwertung vernachlässigter Gartenflächen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">delete_sweep</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Laubentsorgung</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Saisonale Laubreinigung auf Rasenflächen, Terrassen, Wegen und in Abflüssen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20">
+          <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">water</span>
+          <div>
+            <div class="font-headline font-bold text-on-surface text-sm mb-1">Bewässerung</div>
+            <p class="font-body text-on-surface-variant text-xs leading-relaxed">Regelmäßige Bewässerung von Beeten, Kübeln und Rasenflächen auf Wunsch.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section class="py-16 bg-surface-container-low">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+      <h2 class="font-headline text-2xl font-bold text-on-surface mb-8">Referenzprojekte</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="gallery-img-wrap h-64"><img src="pic1.png" alt="Gepflegter Herrschaftsgarten" class="gallery-img"></div>
+        <div class="gallery-img-wrap h-64"><img src="pic2.png" alt="Makellos getrimmte Buchshecken" class="gallery-img"></div>
+        <div class="gallery-img-wrap h-64"><img src="pic3.png" alt="Naturstein-Terrassengarten" class="gallery-img"></div>
+        <div class="gallery-img-wrap h-64"><img src="pic4.jpg" alt="Gepflegter Garten" class="gallery-img"></div>
+        <div class="gallery-img-wrap h-64 md:col-span-2"><img src="pic5.jpg" alt="Heckenpflege Starnberg" class="gallery-img" style="object-position:center 30%;"></div>
+      </div>
+      <p class="font-body text-on-surface-variant text-xs mt-4">Alle Fotos zeigen echte Referenzprojekte aus unserem Einsatzgebiet.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 bg-primary">
+    <div class="max-w-[760px] mx-auto px-6 md:px-12 text-center">
+      <h2 class="font-headline text-[2rem] font-bold text-on-primary mb-4">Kostenloses Angebot anfordern</h2>
+      <p class="font-body text-on-primary/75 mb-8">Unverbindlich und schnell — wir melden uns in der Regel noch am selben Tag.</p>
+      <a href="index.html#anfrage" class="inline-flex items-center gap-2 bg-on-primary text-primary px-8 py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition-opacity">
+        Jetzt anfragen
+        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="bg-inverse-surface">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-12 py-8">
+    <div class="border-t border-inverse-on-surface/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-3">
+      <p class="font-body text-inverse-on-surface/35 text-xs">© 2024 FS-Hausmeisterservice · Faruk Sijarina. Alle Rechte vorbehalten.</p>
+      <a href="impressum.html" class="font-body text-inverse-on-surface/35 text-xs hover:text-primary transition-colors">Impressum</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
